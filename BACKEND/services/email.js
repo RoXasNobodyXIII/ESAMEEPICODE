@@ -3,15 +3,9 @@ const nodemailer = require('nodemailer');
 const DEFAULT_FROM = process.env.EMAIL_FROM || 'no-reply@example.com';
 const DEFAULT_REPLY_TO = process.env.EMAIL_REPLY_TO || undefined;
 
-<<<<<<< HEAD
 // Gmail SMTP
 const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD; 
-=======
-// Gmail SMTP config (preferred when you only have a Gmail address)
-const GMAIL_USER = process.env.GMAIL_USER;
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD; // App Password from Google (requires 2FA)
->>>>>>> d11cca6 (first commit)
 const GMAIL_ENABLED = Boolean(GMAIL_USER && GMAIL_APP_PASSWORD);
 
 let gmailTransport = null;
@@ -25,18 +19,13 @@ if (GMAIL_ENABLED) {
   });
 }
 
-<<<<<<< HEAD
 // Generic SMTP
-=======
-// Generic SMTP (e.g., SendGrid SMTP, other providers)
->>>>>>> d11cca6 (first commit)
 const SMTP_HOST = process.env.EMAIL_HOST;
 const SMTP_PORT = process.env.EMAIL_PORT ? Number(process.env.EMAIL_PORT) : undefined;
 const SMTP_USER = process.env.EMAIL_USER;
 const SMTP_PASS = process.env.EMAIL_PASSWORD;
 const SMTP_SECURE = String(process.env.EMAIL_SECURE || '').toLowerCase() === 'true'; // optional
 const SMTP_ENABLED = Boolean(SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS);
-<<<<<<< HEAD
 const SMTP_URL = process.env.EMAIL_URL;
 const SMTP_POOL = String(process.env.EMAIL_POOL || '').toLowerCase() === 'true';
 const SMTP_IGNORE_TLS = String(process.env.EMAIL_IGNORE_TLS || '').toLowerCase() === 'true';
@@ -53,36 +42,20 @@ if (SMTP_URL) {
     host: SMTP_HOST,
     port: SMTP_PORT,
     secure: SMTP_SECURE,
-=======
-
-let smtpTransport = null;
-if (SMTP_ENABLED) {
-  smtpTransport = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_SECURE, // false for STARTTLS on 587, true for SMTPS on 465
->>>>>>> d11cca6 (first commit)
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,
     },
-<<<<<<< HEAD
     ignoreTLS: SMTP_IGNORE_TLS || undefined,
     requireTLS: SMTP_REQUIRE_TLS || undefined,
     logger: SMTP_LOGGER || undefined,
     debug: SMTP_DEBUG || undefined,
-=======
->>>>>>> d11cca6 (first commit)
   });
 }
 
 function ensureConfigured() {
   // Allow either Gmail SMTP or generic SMTP to be configured
-<<<<<<< HEAD
   if (!GMAIL_ENABLED && !SMTP_ENABLED && !SMTP_URL) {
-=======
-  if (!GMAIL_ENABLED && !SMTP_ENABLED) {
->>>>>>> d11cca6 (first commit)
     const err = new Error('No email provider configured. Set Gmail (GMAIL_USER + GMAIL_APP_PASSWORD) or generic SMTP (EMAIL_HOST/PORT/USER/PASSWORD) in .env');
     err.code = 'EMAIL_NOT_CONFIGURED';
     throw err;
@@ -90,7 +63,6 @@ function ensureConfigured() {
 }
 
 /**
-<<<<<<< HEAD
  * Send an email via Gmail
  * @param {Object} params
  * @param {string|string[]} params.to
@@ -102,19 +74,6 @@ function ensureConfigured() {
  * @param {string|string[]} [params.cc]
  * @param {string|string[]} [params.bcc]
  * @param {Array} [params.attachments] - 
-=======
- * Send an email via Gmail (if configured) otherwise via generic SMTP
- * @param {Object} params
- * @param {string|string[]} params.to - Recipient(s)
- * @param {string} params.subject - Subject line
- * @param {string} [params.text] - Plain text content
- * @param {string} [params.html] - HTML content
- * @param {string|Object} [params.from] - From address or object
- * @param {string|Object} [params.replyTo] - Reply-To address or object
- * @param {string|string[]} [params.cc]
- * @param {string|string[]} [params.bcc]
- * @param {Array} [params.attachments] - As per @sendgrid/mail format
->>>>>>> d11cca6 (first commit)
  * @param {string[]} [params.categories]
  * @param {Object} [params.customArgs]
  * @param {Object} [params.headers]
@@ -139,19 +98,10 @@ async function sendMail({
 
   const normalizeList = (val) => (Array.isArray(val) ? val : val ? [val] : undefined);
 
-<<<<<<< HEAD
-
   if (GMAIL_ENABLED) {
     try {
       const mailOptions = {
         from: GMAIL_USER,
-=======
-  // Prefer Gmail if configured, to allow sending From a Gmail address with proper authentication
-  if (GMAIL_ENABLED) {
-    try {
-      const mailOptions = {
-        from: GMAIL_USER, // enforce alignment with Gmail account
->>>>>>> d11cca6 (first commit)
         to: normalizeList(to),
         subject,
         text: text || undefined,
@@ -159,20 +109,12 @@ async function sendMail({
         cc: normalizeList(cc),
         bcc: normalizeList(bcc),
         replyTo: replyTo || DEFAULT_REPLY_TO || undefined,
-<<<<<<< HEAD
-=======
-        // Nodemailer attachments format may differ from SendGrid; pass-through only if already nodemailer-compatible
->>>>>>> d11cca6 (first commit)
         attachments: Array.isArray(attachments) ? attachments : undefined,
         headers: headers || undefined,
       };
       const info = await gmailTransport.sendMail(mailOptions);
       return {
-<<<<<<< HEAD
         status: 250,
-=======
-        status: 250, // typical success code for SMTP
->>>>>>> d11cca6 (first commit)
         messageId: info?.messageId,
         response: info?.response,
         provider: 'gmail',
@@ -184,13 +126,8 @@ async function sendMail({
     }
   }
 
-<<<<<<< HEAD
- 
+  
   if (SMTP_ENABLED || SMTP_URL) {
-=======
-  // Next, try generic SMTP if configured
-  if (SMTP_ENABLED) {
->>>>>>> d11cca6 (first commit)
     try {
       const smtpFrom = DEFAULT_FROM;
       if (from && from !== smtpFrom) {
@@ -222,7 +159,6 @@ async function sendMail({
     }
   }
 
-<<<<<<< HEAD
 }
 
 async function verifyMailTransport() {
@@ -232,10 +168,3 @@ async function verifyMailTransport() {
 }
 
 module.exports = { sendMail, verifyMailTransport };
-
-=======
-  // If neither Gmail nor SMTP are configured, this function would have thrown earlier
-}
-
-module.exports = { sendMail };
->>>>>>> d11cca6 (first commit)

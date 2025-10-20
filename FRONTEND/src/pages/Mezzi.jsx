@@ -7,7 +7,6 @@ const Mezzi = () => {
 
   return (
     <div className="container mt-5">
-<<<<<<< HEAD
       <h2> I Nostri Mezzi</h2>
 
       <div className="card mt-3">
@@ -22,12 +21,9 @@ const Mezzi = () => {
           </ul>
         </div>
       </div>
-=======
-      <h2>Mezzi</h2>
-      <p className="text-muted">Panoramica dei mezzi a disposizione dell'associazione (ambulanze, mezzi AIB, supporto logistico).</p>
->>>>>>> d11cca6 (first commit)
     </div>
   );
 };
 
 export default Mezzi;
+

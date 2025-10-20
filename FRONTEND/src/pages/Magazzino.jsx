@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { getAccessToken, getUserRole } from '../auth';
@@ -141,20 +140,9 @@ const Magazzino = () => {
           )}
         </div>
       </div>
-=======
-import React, { useEffect } from 'react';
-
-const Magazzino = () => {
-  useEffect(() => {
-    document.title = 'Magazzino';
-  }, []);
-  return (
-    <div>
-      <h4>Magazzino</h4>
-      <p className="text-muted">CRUD materiali/dispositivi (lista, aggiungi, modifica, elimina) – integrazione API da implementare.</p>
->>>>>>> d11cca6 (first commit)
     </div>
   );
 };
 
 export default Magazzino;
+

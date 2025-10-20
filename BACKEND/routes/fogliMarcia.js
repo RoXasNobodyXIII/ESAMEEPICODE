@@ -1,7 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
 const router = express.Router();
-<<<<<<< HEAD
 const { encrypt, decrypt } = require('../services/crypto');
 
 async function getCurrentUser(req) {
@@ -14,22 +13,15 @@ function hasPerm(user, section, key) {
   if (user.role === 'admin') return true;
   return user?.permessi?.[section]?.[key] === true;
 }
-=======
->>>>>>> d11cca6 (first commit)
 
 // Collection name
 const COLLECTION = 'fogli_marcia';
 const ODO_COLLECTION = 'mezzi_odo';
 const COUNTERS_COLLECTION = 'service_counters';
-<<<<<<< HEAD
 const PDFDocument = require('pdfkit');
 const https = require('https');
 
 // Validate input
-=======
-
-// Validate and normalize input
->>>>>>> d11cca6 (first commit)
 function validatePayload(body) {
   const required = ['tipologiaServizio','data','richiestoDa','motivoServizio','cognome','nome'];
   for (const k of required) {
@@ -40,7 +32,6 @@ function validatePayload(body) {
   return { ok: true };
 }
 
-<<<<<<< HEAD
 
 router.post('/', authMiddleware, async (req, res) => {
   try {
@@ -48,11 +39,6 @@ router.post('/', authMiddleware, async (req, res) => {
     if (!hasPerm(user, 'fogliMarcia', 'inserire')) {
       return res.status(403).json({ message: 'Permesso mancante: fogliMarcia.inserire' });
     }
-=======
-// POST /fogli-marcia -> create new record
-router.post('/', authMiddleware, async (req, res) => {
-  try {
->>>>>>> d11cca6 (first commit)
     const db = req.app.locals.db;
     const col = db.collection(COLLECTION);
     const odos = db.collection(ODO_COLLECTION);
@@ -62,35 +48,18 @@ router.post('/', authMiddleware, async (req, res) => {
     const check = validatePayload(payload);
     if (!check.ok) return res.status(400).json({ message: check.message });
 
-<<<<<<< HEAD
     // mezzo
     const mezzo = (payload.mezzo || '').trim();
 
-=======
-    // normalize mezzo
-    const mezzo = (payload.mezzo || '').trim();
-    console.log('[POST /fogli-marcia] payload keys:', Object.keys(payload));
-    console.log('[POST /fogli-marcia] mezzo:', mezzo || '(none)');
-
-    // helper: get current odometer with baseline if needed
->>>>>>> d11cca6 (first commit)
     async function getCurrentOdo(mz) {
       if (!mz) return null;
       const existing = await odos.findOne({ mezzo: mz });
       if (existing && typeof existing.currentKm === 'number') return existing.currentKm;
-<<<<<<< HEAD
 
       let baseline = null;
       if (mz.startsWith('A03') || mz.includes('GG772FV') || mz.includes('1106')) baseline = 88904;
       else if (mz.startsWith('A04') || mz.includes('GN005MH') || mz.includes('1284')) baseline = 60803;
 
-=======
-      // Baseline defaults
-      let baseline = null;
-      if (mz.startsWith('A03') || mz.includes('GG772FV') || mz.includes('1106')) baseline = 88904;
-      else if (mz.startsWith('A04') || mz.includes('GN005MH') || mz.includes('1284')) baseline = 60803;
-      // If baseline defined, upsert now
->>>>>>> d11cca6 (first commit)
       if (baseline !== null) {
         await odos.updateOne(
           { mezzo: mz },
@@ -99,17 +68,9 @@ router.post('/', authMiddleware, async (req, res) => {
         );
         return baseline;
       }
-<<<<<<< HEAD
       return 0; 
     }
 
-=======
-      return 0; // default if unknown mezzo
-    }
-
-    // generate incremental id (legacy numeric)
-    // Use atomic counter to avoid duplicates or resets
->>>>>>> d11cca6 (first commit)
     let nextId = 1;
     try {
       const idCounter = await counters.findOneAndUpdate(
@@ -124,20 +85,11 @@ router.post('/', authMiddleware, async (req, res) => {
       nextId = last.length ? (Number(last[0].id) || 0) + 1 : 1;
     }
 
-<<<<<<< HEAD
   
-=======
-    // generate per-year service code: CDOyyNNNNN, where yy = last two digits of year, NNNNN = 5-digit sequence per year
->>>>>>> d11cca6 (first commit)
     const year = new Date().getFullYear();
     const yy = String(year % 100).padStart(2, '0');
     let serviceCode = `CDO${yy}00000`;
     try {
-<<<<<<< HEAD
-=======
-      console.log('[POST /fogli-marcia] incrementing counter for year');
-      // Use per-year atomic counter with stable _id and no conflicting seq in $setOnInsert
->>>>>>> d11cca6 (first commit)
       const counterDoc = await counters.findOneAndUpdate(
         { _id: `fogli_marcia_year_${year}` },
         { $inc: { seq: 1 }, $setOnInsert: { _id: `fogli_marcia_year_${year}`, year, createdAt: new Date() } },
@@ -147,40 +99,23 @@ router.post('/', authMiddleware, async (req, res) => {
       if (!Number.isFinite(seq)) {
         console.warn('[POST /fogli-marcia] counterDoc.value.seq invalid, refetching');
         const after = await counters.findOne({ _id: `fogli_marcia_year_${year}` });
-<<<<<<< HEAD
         seq = Number(after?.seq) || 1; 
-=======
-        seq = Number(after?.seq) || 1;
->>>>>>> d11cca6 (first commit)
       }
       serviceCode = `CDO${yy}${String(seq).padStart(5, '0')}`;
     } catch (e) {
       console.error('[POST /fogli-marcia] counter increment failed:', e?.message);
-<<<<<<< HEAD
       const t = Date.now() % 100000;
       serviceCode = `CDO${yy}${String(t).padStart(5, '0')}`;
     }
     
-=======
-      // fallback: derive a semi-unique sequence from time to avoid duplicates
-      const t = Date.now() % 100000; // last 5 digits of timestamp
-      serviceCode = `CDO${yy}${String(t).padStart(5, '0')}`;
-    }
-    console.log('[POST /fogli-marcia] serviceCode:', serviceCode);
-
-    // ensure kmIniziali default from odometer if not provided
->>>>>>> d11cca6 (first commit)
     if ((!payload.kmIniziali && payload.kmIniziali !== 0) && mezzo) {
       payload.kmIniziali = await getCurrentOdo(mezzo);
     }
 
-<<<<<<< HEAD
     const encKeys = ['note','destinazione','indirizzo','cognome','nome'];
     for (const k of encKeys) {
       if (payload[k] != null && String(payload[k]).trim() !== '') payload[k] = encrypt(payload[k]);
     }
-=======
->>>>>>> d11cca6 (first commit)
     const doc = {
       id: nextId,
       createdAt: new Date(),
@@ -189,7 +124,6 @@ router.post('/', authMiddleware, async (req, res) => {
       ...payload,
     };
 
-<<<<<<< HEAD
     let result;
     try {
       result = await col.insertOne(doc);
@@ -206,12 +140,6 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     // Update kmFinali
-=======
-    const result = await col.insertOne(doc);
-    console.log('[POST /fogli-marcia] inserted id:', result.insertedId);
-
-    // Update odometer if kmFinali present and valid
->>>>>>> d11cca6 (first commit)
     const kmIni = Number(payload.kmIniziali);
     const kmFin = Number(payload.kmFinali);
     try {
@@ -224,10 +152,6 @@ router.post('/', authMiddleware, async (req, res) => {
       }
     } catch (e) {
       console.warn('[POST /fogli-marcia] odometer update failed:', e?.message);
-<<<<<<< HEAD
-=======
-      // do not fail request due to auxiliary update
->>>>>>> d11cca6 (first commit)
     }
 
     return res.status(201).json({ id: nextId, serviceCode, _id: result.insertedId, message: 'Creato' });
@@ -237,7 +161,6 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const user = await getCurrentUser(req);
@@ -304,28 +227,13 @@ router.get('/', authMiddleware, async (req, res) => {
       return true;
     });
     return res.json(filtered);
-=======
-// GET /fogli-marcia -> list (optional filter by mezzo)
-router.get('/', authMiddleware, async (req, res) => {
-  try {
-    const db = req.app.locals.db;
-    const col = db.collection(COLLECTION);
-    const q = {};
-    if (req.query.mezzo) q.mezzo = String(req.query.mezzo);
-    const items = await col.find(q).sort({ createdAt: -1 }).limit(200).toArray();
-    return res.json(items);
->>>>>>> d11cca6 (first commit)
   } catch (err) {
     console.error('Errore list fogli marcia:', err);
     return res.status(500).json({ message: 'Errore server' });
   }
 });
 
-<<<<<<< HEAD
 
-=======
-// GET /fogli-marcia/:id -> get single by numeric id
->>>>>>> d11cca6 (first commit)
 router.get('/:id(\\d+)', authMiddleware, async (req, res) => {
   try {
     const db = req.app.locals.db;
@@ -334,39 +242,28 @@ router.get('/:id(\\d+)', authMiddleware, async (req, res) => {
     if (!Number.isFinite(id)) return res.status(400).json({ message: 'ID non valido' });
     const doc = await col.findOne({ id });
     if (!doc) return res.status(404).json({ message: 'Non trovato' });
-<<<<<<< HEAD
     const encKeys = ['note','destinazione','indirizzo','cognome','nome'];
     const o = { ...doc };
     for (const k of encKeys) {
       if (o[k]) o[k] = decrypt(o[k]);
     }
     return res.json(o);
-=======
-    return res.json(doc);
->>>>>>> d11cca6 (first commit)
   } catch (err) {
     console.error('Errore get foglio marcia:', err);
     return res.status(500).json({ message: 'Errore server' });
   }
 });
 
-<<<<<<< HEAD
 router.put('/:id(\\d+)', authMiddleware, async (req, res) => {
   try {
     const user = await getCurrentUser(req);
     if (!hasPerm(user, 'fogliMarcia', 'modifica')) {
       return res.status(403).json({ message: 'Permesso mancante: fogliMarcia.modifica' });
     }
-=======
-// PUT /fogli-marcia/:id -> update limited fields
-router.put('/:id(\\d+)', authMiddleware, async (req, res) => {
-  try {
->>>>>>> d11cca6 (first commit)
     const db = req.app.locals.db;
     const col = db.collection(COLLECTION);
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ message: 'ID non valido' });
-<<<<<<< HEAD
     const allowed = ['indirizzo','uscita','sulPosto','arrivoDestinazione','fine','esito','destinazione','note','autista','soccorritore1','soccorritore2','infermiere','medico','kmFinali','cognome','nome'];
     const update = {};
     for (const k of allowed) if (k in req.body) update[k] = req.body[k];
@@ -374,34 +271,21 @@ router.put('/:id(\\d+)', authMiddleware, async (req, res) => {
     for (const k of encKeys) {
       if (k in update && update[k] != null && String(update[k]).trim() !== '') update[k] = encrypt(update[k]);
     }
-=======
-    const allowed = ['indirizzo','uscita','sulPosto','arrivoDestinazione','fine','esito','destinazione','note','autista','soccorritore1','soccorritore2','infermiere','medico','kmFinali'];
-    const update = {};
-    for (const k of allowed) if (k in req.body) update[k] = req.body[k];
->>>>>>> d11cca6 (first commit)
     if (Object.keys(update).length === 0) return res.status(400).json({ message: 'Nessun campo aggiornabile fornito' });
     update.updatedAt = new Date();
     const result = await col.findOneAndUpdate({ id }, { $set: update }, { returnDocument: 'after' });
     if (!result.value) return res.status(404).json({ message: 'Non trovato' });
-<<<<<<< HEAD
     const o = { ...result.value };
     for (const k of encKeys) {
       if (o[k]) o[k] = decrypt(o[k]);
     }
     return res.json({ message: 'Aggiornato', item: o });
-=======
-    return res.json({ message: 'Aggiornato', item: result.value });
->>>>>>> d11cca6 (first commit)
   } catch (err) {
     console.error('Errore update foglio marcia:', err);
     return res.status(500).json({ message: 'Errore server' });
   }
 });
 
-<<<<<<< HEAD
-=======
-// DELETE /fogli-marcia/:id -> delete by numeric id
->>>>>>> d11cca6 (first commit)
 router.delete('/:id(\\d+)', authMiddleware, async (req, res) => {
   try {
     const db = req.app.locals.db;
@@ -417,11 +301,7 @@ router.delete('/:id(\\d+)', authMiddleware, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 
-=======
-// GET /fogli-marcia/odometer?mezzo=... -> currentKm for mezzo with baseline if needed
->>>>>>> d11cca6 (first commit)
 router.get('/odometer', authMiddleware, async (req, res) => {
   try {
     const db = req.app.locals.db;
@@ -431,10 +311,6 @@ router.get('/odometer', authMiddleware, async (req, res) => {
 
     let rec = await odos.findOne({ mezzo });
     if (!rec) {
-<<<<<<< HEAD
-=======
-      // Seed baseline if applicable
->>>>>>> d11cca6 (first commit)
       let baseline = null;
       if (mezzo.startsWith('A03') || mezzo.includes('GG772FV') || mezzo.includes('1106')) baseline = 88904;
       else if (mezzo.startsWith('A04') || mezzo.includes('GN005MH') || mezzo.includes('1284')) baseline = 60803;
@@ -453,7 +329,6 @@ router.get('/odometer', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
-<<<<<<< HEAD
 
 // PDF Report: GET /fogli-marcia/report?from=YYYY-MM-DDTHH:mm&to=YYYY-MM-DDTHH:mm&mezzo=...&postazione=...
 router.get('/report', authMiddleware, async (req, res) => {
@@ -676,5 +551,4 @@ router.get('/report', authMiddleware, async (req, res) => {
     return res.status(500).json({ message: 'Errore generazione report' });
   }
 });
-=======
->>>>>>> d11cca6 (first commit)
+

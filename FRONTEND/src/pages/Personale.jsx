@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-<<<<<<< HEAD
 import { createPortal } from 'react-dom';
-=======
->>>>>>> d11cca6 (first commit)
 import api from '../api';
 import { getUserRole } from '../auth';
 
@@ -14,7 +11,6 @@ const Personale = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-<<<<<<< HEAD
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -52,14 +48,11 @@ const Personale = () => {
     amministrazione: { utenti: false, mezzi: false }
   });
   
-=======
->>>>>>> d11cca6 (first commit)
 
   useEffect(() => { document.title = 'Gestione Personale'; }, []);
 
   const isAdmin = getUserRole() === 'admin';
 
-<<<<<<< HEAD
   const loadUsers = async () => {
     if (!isAdmin) return;
     setLoadingUsers(true);
@@ -79,8 +72,6 @@ const Personale = () => {
   
 
 
-=======
->>>>>>> d11cca6 (first commit)
   const onSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
@@ -92,7 +83,6 @@ const Personale = () => {
 
     setLoading(true);
     try {
-<<<<<<< HEAD
       const payload = { nome, cognome, email, role, cellulare, qualifiche, stato, permessi };
       const { data } = await api.post('/users/invite', payload);
       setMessage(`Utente creato: ${data.user.username}. È stata inviata un'email con le credenziali.`);
@@ -109,11 +99,6 @@ const Personale = () => {
       setAssociate(false);
       
       await loadUsers();
-=======
-      const { data } = await api.post('/users/invite', { nome, cognome, email, role });
-      setMessage(`Utente creato: ${data.user.username}. È stata inviata un'email con le credenziali.`);
-      setNome(''); setCognome(''); setEmail(''); setRole('volontario');
->>>>>>> d11cca6 (first commit)
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Errore creazione utente';
       setError(msg);
@@ -122,7 +107,6 @@ const Personale = () => {
     }
   };
 
-<<<<<<< HEAD
   const openEdit = (u) => {
     setSelectedUser(u);
     setEditUserId(u.id);
@@ -232,8 +216,6 @@ const Personale = () => {
     }
   };
 
-=======
->>>>>>> d11cca6 (first commit)
   return (
     <div>
       <h4 className="mb-3">Gestione Personale</h4>
@@ -241,7 +223,6 @@ const Personale = () => {
         <div className="alert alert-warning">Solo gli amministratori possono accedere a questa sezione.</div>
       )}
 
-<<<<<<< HEAD
       {deleteModalOpen && createPortal(
         <div className="modal d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,.5)', position: 'fixed', inset: 0, zIndex: 2100 }}>
           <div className="modal-dialog" role="document">
@@ -655,44 +636,9 @@ const Personale = () => {
           </div>
         </div>
       )}
-=======
-      <div className="card">
-        <div className="card-body">
-          {message && <div className="alert alert-success">{message}</div>}
-          {error && <div className="alert alert-danger">{error}</div>}
-          <form onSubmit={onSubmit}>
-            <div className="row g-3">
-              <div className="col-md-4">
-                <label className="form-label">Nome</label>
-                <input className="form-control" value={nome} onChange={(e) => setNome(e.target.value)} required />
-              </div>
-              <div className="col-md-4">
-                <label className="form-label">Cognome</label>
-                <input className="form-control" value={cognome} onChange={(e) => setCognome(e.target.value)} required />
-              </div>
-              <div className="col-md-4">
-                <label className="form-label">Email</label>
-                <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </div>
-              <div className="col-md-4">
-                <label className="form-label">Ruolo</label>
-                <select className="form-select" value={role} onChange={(e) => setRole(e.target.value)}>
-                  <option value="volontario">Volontario</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-            <div className="mt-3">
-              <button className="btn btn-primary" type="submit" disabled={loading || !isAdmin}>
-                {loading ? 'Creazione...' : 'Crea utente e invia credenziali'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
->>>>>>> d11cca6 (first commit)
     </div>
   );
 };
 
 export default Personale;
+

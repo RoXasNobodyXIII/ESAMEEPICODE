@@ -6,19 +6,12 @@ const roleMiddleware = require('../middleware/role');
 const { sendMail } = require('../services/email');
 const crypto = require('crypto');
 const router = express.Router();
-<<<<<<< HEAD
 const APP_PUBLIC_URL = process.env.APP_PUBLIC_URL || process.env.FRONTEND_URL || '';
 
 // MongoDB 
-=======
-
-// MongoDB collection helper
->>>>>>> d11cca6 (first commit)
 function getUsersCol(req) {
   return req.app.locals.db.collection('users');
 }
-
-<<<<<<< HEAD
 
 const userValidationRules = [
   body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
@@ -77,27 +70,12 @@ router.get('/me', authMiddleware, async (req, res) => {
     return res.status(500).json({ message: 'Errore server' });
   }
 });
-
-
-=======
-// Validation rules
-const userValidationRules = [
-  body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('email').isEmail().withMessage('Must be a valid email'),
-  body('role').isIn(['admin', 'volontario']).withMessage('Role must be admin or volontario')
-];
-
-// For create route: password optional (we will generate an 8-word passphrase if missing)
->>>>>>> d11cca6 (first commit)
 const createUserValidationRules = [
   body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
   body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters if provided'),
   body('email').isEmail().withMessage('Must be a valid email'),
   body('role').isIn(['admin', 'volontario']).withMessage('Role must be admin or volontario')
 ];
-
-<<<<<<< HEAD
 
 function generateRandomPassword(length = 8) {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -108,32 +86,6 @@ function generateRandomPassword(length = 8) {
   }
   return out;
 }
-
-
-=======
-// Simple passphrase generator (8+ words)
-function generatePassphrase(wordCount = 8) {
-  const words = [
-    'alpha','bravo','charlie','delta','echo','foxtrot','golf','hotel','india','juliet','kilo','lima','mike','november','oscar','papa','quebec','romeo','sierra','tango','uniform','victor','whiskey','xray','yankee','zulu',
-    'red','blue','green','yellow','purple','orange','black','white','silver','gold','bronze','grey',
-    'cloud','river','mountain','forest','ocean','desert','valley','island','meadow','canyon',
-    'sun','moon','star','comet','planet','galaxy','orbit','eclipse','aurora','nebula',
-    'stone','wood','metal','glass','paper','cotton','silk','leather','clay','sand',
-    'rapid','silent','bright','calm','proud','brave','swift','wise','noble','true',
-    'eagle','tiger','lion','panda','wolf','bear','falcon','otter','dragon','phoenix'
-  ];
-  const picks = [];
-  for (let i = 0; i < Math.max(8, wordCount); i += 1) {
-    const idx = crypto.randomInt(0, words.length);
-    picks.push(words[idx]);
-  }
-  // add a random 2-digit number to increase entropy
-  const num = String(crypto.randomInt(10, 99));
-  return `${picks.join('-')}-${num}`;
-}
-
-// GET /users - List all users (admin only)
->>>>>>> d11cca6 (first commit)
 router.get('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
     const users = await getUsersCol(req).find({}, { projection: { _id: 0 } }).toArray();
@@ -144,12 +96,6 @@ router.get('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-
-=======
-// POST /users/invite - Create user with generated credentials and email them (admin only)
-// Body: { nome, cognome, email, role }
->>>>>>> d11cca6 (first commit)
 router.post(
   '/invite',
   authMiddleware,
@@ -158,7 +104,6 @@ router.post(
     body('nome').isLength({ min: 1 }).withMessage('Nome richiesto'),
     body('cognome').isLength({ min: 1 }).withMessage('Cognome richiesto'),
     body('email').isEmail().withMessage('Email non valida'),
-<<<<<<< HEAD
     body('role').isIn(['admin', 'volontario']).withMessage('Ruolo non valido'),
     // opzionali aggiuntivi
     body('cellulare').optional().isString().trim(),
@@ -198,9 +143,6 @@ router.post(
     body('permessi.amministrazione.mezzi').optional().isBoolean().toBoolean(),
     body('permessi.amministrazione.impostazioni').optional().isBoolean().toBoolean(),
     body('personaleId').optional().isInt().toInt()
-=======
-    body('role').isIn(['admin', 'volontario']).withMessage('Ruolo non valido')
->>>>>>> d11cca6 (first commit)
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -209,7 +151,6 @@ router.post(
     }
 
     const { nome, cognome, email, role } = req.body;
-<<<<<<< HEAD
     const cellulare = typeof req.body.cellulare === 'string' ? req.body.cellulare.trim() : undefined;
     const qualifiche = Array.isArray(req.body.qualifiche) ? req.body.qualifiche : [];
     const stato = {
@@ -264,13 +205,6 @@ router.post(
       }
     };
     const usersCol = getUsersCol(req);
-
-
-=======
-    const usersCol = getUsersCol(req);
-
-    // Helper: build username inizialenome.cognome (normalized, lowercase, ascii)
->>>>>>> d11cca6 (first commit)
     const normalize = (s) =>
       String(s || '')
         .trim()
@@ -284,19 +218,12 @@ router.post(
     let baseUsername = n && c ? `${n.charAt(0)}.${c}` : (c || n || 'user');
     baseUsername = baseUsername.replace(/\.+/g, '.');
 
-<<<<<<< HEAD
-
-=======
-    // Ensure uniqueness by appending a number if needed
->>>>>>> d11cca6 (first commit)
     let username = baseUsername;
     let suffix = 1;
     while (await usersCol.findOne({ username })) {
       suffix += 1;
       username = `${baseUsername}${suffix}`;
     }
-
-<<<<<<< HEAD
 
     const plainPassword = generateRandomPassword(8);
 
@@ -323,26 +250,10 @@ router.post(
     await usersCol.insertOne(newUser);
 
     // credenziali email
-=======
-    // Generate strong passphrase of at least 8 words (store only hash)
-    const plainPassword = generatePassphrase(8);
-
-    const hashedPassword = await bcrypt.hash(plainPassword, 10);
-
-    // Compute next incremental id
-    const last = await usersCol.find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
-    const nextId = last.length ? (Number(last[0].id) || 0) + 1 : 1;
-
-    const newUser = { id: nextId, username, password: hashedPassword, email, role, nome, cognome };
-    await usersCol.insertOne(newUser);
-
-    // Send email with credentials
->>>>>>> d11cca6 (first commit)
     try {
       await sendMail({
         to: email,
         subject: 'Credenziali di accesso',
-<<<<<<< HEAD
         text: `Benvenuto/a!\n\nUsername: ${username}\nPassword temporanea: ${plainPassword}\n\nAccedi qui: ${APP_PUBLIC_URL ? (APP_PUBLIC_URL.replace(/\/$/, '') + '/login') : ''}\n\nSe il tuo telefono lo consente, puoi installare l'app dalla pagina di login (link diretto installazione: ${APP_PUBLIC_URL ? (APP_PUBLIC_URL.replace(/\/$/, '') + '/login?install=1') : ''}).\n\nTi invitiamo a effettuare il primo accesso e cambiare la password.`,
         html: `<p>Benvenuto/a!</p>
                <p><b>Username:</b> ${username}<br/>
@@ -357,16 +268,6 @@ router.post(
           .filter(Boolean)
       });
     } catch (e) {
-=======
-        text: `Benvenuto/a!\n\nUsername: ${username}\nPassword temporanea: ${plainPassword}\n\nTi invitiamo a effettuare il primo accesso e cambiare la password.`,
-        html: `<p>Benvenuto/a!</p>
-               <p><b>Username:</b> ${username}<br/>
-               <b>Password temporanea:</b> ${plainPassword}</p>
-               <p>Ti invitiamo a effettuare il primo accesso e cambiare la password.</p>`
-      });
-    } catch (e) {
-      // Log but don't fail creation if email fails
->>>>>>> d11cca6 (first commit)
       console.warn('Email invio fallito:', e?.message);
     }
 
@@ -375,11 +276,6 @@ router.post(
   }
 );
 
-<<<<<<< HEAD
-
-=======
-// GET /users/:id - Get user by ID
->>>>>>> d11cca6 (first commit)
 router.get('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -392,11 +288,6 @@ router.get('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) =
   }
 });
 
-<<<<<<< HEAD
-
-=======
-// POST /users - Create new user (admin only)
->>>>>>> d11cca6 (first commit)
 router.post('/', authMiddleware, roleMiddleware(['admin']), createUserValidationRules, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -410,33 +301,18 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), createUserValidation
     const existing = await usersCol.findOne({ username });
     if (existing) return res.status(400).json({ message: 'Username already exists' });
 
-<<<<<<< HEAD
     const plainPassword = password && String(password).trim().length >= 6 ? String(password) : generateRandomPassword(8);
-=======
-    // Use provided password if present, otherwise generate an 8-word passphrase
-    const plainPassword = password && String(password).trim().length >= 6 ? String(password) : generatePassphrase(8);
->>>>>>> d11cca6 (first commit)
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const last = await usersCol.find({}, { projection: { id: 1 } }).sort({ id: -1 }).limit(1).toArray();
     const nextId = last.length ? last[0].id + 1 : 1;
 
-<<<<<<< HEAD
     const newUser = { id: nextId, username, password: hashedPassword, email, role, suspended: false };
     await usersCol.insertOne(newUser);
-
-
-=======
-    const newUser = { id: nextId, username, password: hashedPassword, email, role };
-    await usersCol.insertOne(newUser);
-
-    // Send email with credentials
->>>>>>> d11cca6 (first commit)
     try {
       await sendMail({
         to: email,
         subject: 'Credenziali di accesso',
-<<<<<<< HEAD
         text: `Benvenuto/a!\n\nUsername: ${username}\nPassword temporanea: ${plainPassword}\n\nAccedi qui: ${APP_PUBLIC_URL ? (APP_PUBLIC_URL.replace(/\/$/, '') + '/login') : ''}\n\nSe il tuo telefono lo consente, puoi installare l'app dalla pagina di login (link diretto installazione: ${APP_PUBLIC_URL ? (APP_PUBLIC_URL.replace(/\/$/, '') + '/login?install=1') : ''}).\n\nTi invitiamo a effettuare il primo accesso e cambiare la password.`,
         html: `<p>Benvenuto/a!</p>
                <p><b>Username:</b> ${username}<br/>
@@ -449,13 +325,6 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), createUserValidation
           .split(',')
           .map((s) => s.trim())
           .filter(Boolean)
-=======
-        text: `Benvenuto/a!\n\nUsername: ${username}\nPassword temporanea: ${plainPassword}\n\nTi invitiamo a effettuare il primo accesso e cambiare la password.`,
-        html: `<p>Benvenuto/a!</p>
-               <p><b>Username:</b> ${username}<br/>
-               <b>Password temporanea:</b> ${plainPassword}</p>
-               <p>Ti invitiamo a effettuare il primo accesso e cambiare la password.</p>`
->>>>>>> d11cca6 (first commit)
       });
     } catch (e) {
       console.warn('Email invio fallito:', e?.message);
@@ -468,10 +337,6 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), createUserValidation
   }
 });
 
-<<<<<<< HEAD
-=======
-// PUT /users/:id - Update user (admin only)
->>>>>>> d11cca6 (first commit)
 router.put('/:id', authMiddleware, roleMiddleware(['admin']), userValidationRules, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -490,7 +355,6 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), userValidationRule
       if (usernameTaken) return res.status(400).json({ message: 'Username already exists' });
     }
 
-<<<<<<< HEAD
     const cellulare = typeof req.body.cellulare === 'string' ? req.body.cellulare.trim() : existing.cellulare;
     const qualifiche = Array.isArray(req.body.qualifiche) ? req.body.qualifiche : existing.qualifiche || [];
     const stato = {
@@ -546,9 +410,6 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), userValidationRule
     };
 
     const updateDoc = { username, email, role, cellulare, qualifiche, stato, permessi };
-=======
-    const updateDoc = { username, email, role };
->>>>>>> d11cca6 (first commit)
     if (password) {
       updateDoc.password = await bcrypt.hash(password, 10);
     }
@@ -561,11 +422,6 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), userValidationRule
   }
 });
 
-<<<<<<< HEAD
-
-=======
-// DELETE /users/:id - Delete user (admin only)
->>>>>>> d11cca6 (first commit)
 router.delete('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -576,8 +432,6 @@ router.delete('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res
     res.status(500).json({ message: 'Failed to delete user' });
   }
 });
-
-<<<<<<< HEAD
 
 router.patch('/:id/suspend', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
@@ -607,7 +461,4 @@ router.patch('/:id/activate', authMiddleware, roleMiddleware(['admin']), async (
     res.status(500).json({ message: 'Failed to activate user' });
   }
 });
-
-=======
->>>>>>> d11cca6 (first commit)
 module.exports = router;

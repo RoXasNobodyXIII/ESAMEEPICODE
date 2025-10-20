@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-<<<<<<< HEAD
   if (req.method === 'OPTIONS') {
     return next();
   }
@@ -17,15 +16,6 @@ const authMiddleware = (req, res, next) => {
   if (!token) {
     return res.status(401).json({ message: 'Access token required' });
   }
-
-=======
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Access token required' });
-  }
-
-  const token = authHeader.substring(7);
->>>>>>> d11cca6 (first commit)
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;

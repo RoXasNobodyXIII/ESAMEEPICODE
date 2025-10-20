@@ -1,12 +1,9 @@
 import React from 'react';
 
 const News = () => {
-<<<<<<< HEAD
   React.useEffect(() => {
     document.title = "News/Attività";
   }, []);
-=======
->>>>>>> d11cca6 (first commit)
   return (
     <div className="container mt-5">
       <h1>News/Attività</h1>
@@ -29,3 +26,4 @@ const News = () => {
 };
 
 export default News;
+

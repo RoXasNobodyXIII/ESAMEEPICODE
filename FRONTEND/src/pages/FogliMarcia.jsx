@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> d11cca6 (first commit)
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api';
 
@@ -16,35 +12,24 @@ const FogliMarcia = () => {
   const [items, setItems] = useState([]);
   const [editItem, setEditItem] = useState(null); // item in modifica
   const [saving, setSaving] = useState(false);
-<<<<<<< HEAD
   const [vehicles, setVehicles] = useState([]);
   const [vehLoading, setVehLoading] = useState(false);
 
   // Carica elenco mezzo
-=======
-
-  // Carica elenco quando cambia mezzo
->>>>>>> d11cca6 (first commit)
   useEffect(() => {
     setError('');
     setItems([]);
     const m = (mezzo || '').trim();
     if (!m) return;
     setLoading(true);
-<<<<<<< HEAD
     const params = { mezzo: m };
     api
       .get('/fogli-marcia', { params })
-=======
-    api
-      .get('/fogli-marcia', { params: { mezzo: m } })
->>>>>>> d11cca6 (first commit)
       .then(({ data }) => setItems(Array.isArray(data) ? data : []))
       .catch((err) => setError(err.response?.data?.message || 'Errore nel caricamento'))
       .finally(() => setLoading(false));
   }, [mezzo]);
 
-<<<<<<< HEAD
   const loadVehicles = async () => {
     setVehLoading(true);
     try {
@@ -56,9 +41,6 @@ const FogliMarcia = () => {
   useEffect(() => { loadVehicles(); }, []);
 
   // Raggruppa per data
-=======
-  // Raggruppa per data (YYYY-MM-DD) e ordina per sequenza (serviceCode ultimo 5 cifre) o id
->>>>>>> d11cca6 (first commit)
   const grouped = useMemo(() => {
     const fmtDate = (d) => {
       if (!d) return '';
@@ -75,11 +57,7 @@ const FogliMarcia = () => {
       if (!map.has(key)) map.set(key, []);
       map.get(key).push(it);
     }
-<<<<<<< HEAD
     // ordina gruppi
-=======
-    // ordina gruppi per data desc, elementi per seq asc
->>>>>>> d11cca6 (first commit)
     const seqOf = (it) => {
       const sc = it.serviceCode;
       if (sc) {
@@ -152,15 +130,10 @@ const FogliMarcia = () => {
             onChange={(e) => setMezzo(e.target.value)}
           >
             <option value="">- SELEZIONA -</option>
-<<<<<<< HEAD
             {vehicles.map(v => {
               const label = `${v.identificativo || ''} - ${v.targa || ''} - ${v.codiceARES || ''}`.replace(/\s+-\s+-\s*$/,'').trim();
               return <option key={v.id} value={label}>{label}</option>;
             })}
-=======
-            <option>A03 - GG772FV - 1106</option>
-            <option>A04 - GN005MH - 1284</option>
->>>>>>> d11cca6 (first commit)
           </select>
         </div>
       </div>
@@ -178,7 +151,6 @@ const FogliMarcia = () => {
               {grouped.map(([dateKey, arr]) => (
                 <div key={dateKey} className="mb-3">
                   <h5 className="mb-2">{dateKey}</h5>
-<<<<<<< HEAD
                   <div className="d-none d-md-block">
                     <div className="table-responsive">
                       <table className="table table-sm table-hover mb-0">
@@ -232,38 +204,6 @@ const FogliMarcia = () => {
                         </div>
                       ))}
                     </div>
-=======
-                  <div className="table-responsive">
-                    <table className="table table-sm table-hover mb-0">
-                      <thead>
-                        <tr>
-                          <th style={{whiteSpace:'nowrap'}}>#</th>
-                          <th>Indirizzo</th>
-                          <th>Partenza</th>
-                          <th>Fine</th>
-                          <th>Esito</th>
-                          <th>Tools</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {arr.map((f) => (
-                          <tr key={f._id || f.id}>
-                            <td style={{whiteSpace:'nowrap'}}>{f.serviceCode || `#${f.id}`}</td>
-                            <td>{f.indirizzo || '-'}</td>
-                            <td>{f.uscita || '-'}</td>
-                            <td>{f.fine || '-'}</td>
-                            <td>{f.esito || '-'}</td>
-                            <td>
-                              <div className="btn-group btn-group-sm" role="group">
-                                <button className="btn btn-outline-primary" onClick={() => openEdit(f)}>Modifica</button>
-                                <button className="btn btn-outline-danger" onClick={() => delItem(f)}>Elimina</button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
->>>>>>> d11cca6 (first commit)
                   </div>
                 </div>
               ))}
@@ -272,10 +212,6 @@ const FogliMarcia = () => {
         </div>
       </div>
 
-<<<<<<< HEAD
-=======
-      {/* Modal semplice per modifica */}
->>>>>>> d11cca6 (first commit)
       {editItem && (
         <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg" role="document">
@@ -331,3 +267,4 @@ const FogliMarcia = () => {
 };
 
 export default FogliMarcia;
+

@@ -2,16 +2,9 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const authMiddleware = require('../middleware/auth');
 const roleMiddleware = require('../middleware/role');
-<<<<<<< HEAD
 const http = require('http');
 const https = require('https');
 const router = express.Router();
-
-=======
-const router = express.Router();
-
-// Mock warehouse items (in real app, use database)
->>>>>>> d11cca6 (first commit)
 let items = [
   { id: 1, name: 'Bandages', quantity: 100, description: 'Medical bandages' },
   { id: 2, name: 'Gloves', quantity: 50, description: 'Latex gloves' }
@@ -24,16 +17,10 @@ const itemValidationRules = [
   body('description').optional().isLength({ max: 500 }).withMessage('Description must be less than 500 characters')
 ];
 
-<<<<<<< HEAD
-// List all items
-=======
-// GET /warehouse - List all items
->>>>>>> d11cca6 (first commit)
 router.get('/', authMiddleware, (req, res) => {
   res.json(items);
 });
 
-<<<<<<< HEAD
 // List items from MongoDB collection instead of in-memory array
 router.get('/db', authMiddleware, async (req, res) => {
   try {
@@ -57,9 +44,6 @@ router.get('/auth-test', authMiddleware, (req, res) => {
 });
 
 // Get item by ID
-=======
-// GET /warehouse/:id - Get item by ID
->>>>>>> d11cca6 (first commit)
 router.get('/:id', authMiddleware, (req, res) => {
   const item = items.find(i => i.id === parseInt(req.params.id));
   if (!item) {
@@ -68,11 +52,7 @@ router.get('/:id', authMiddleware, (req, res) => {
   res.json(item);
 });
 
-<<<<<<< HEAD
 // Create new item (admin only)
-=======
-// POST /warehouse - Create new item (admin only)
->>>>>>> d11cca6 (first commit)
 router.post('/', authMiddleware, roleMiddleware(['admin']), itemValidationRules, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -91,11 +71,7 @@ router.post('/', authMiddleware, roleMiddleware(['admin']), itemValidationRules,
   res.status(201).json(newItem);
 });
 
-<<<<<<< HEAD
 // Update item (admin only)
-=======
-// PUT /warehouse/:id - Update item (admin only)
->>>>>>> d11cca6 (first commit)
 router.put('/:id', authMiddleware, roleMiddleware(['admin']), itemValidationRules, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -115,11 +91,7 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), itemValidationRule
   res.json(item);
 });
 
-<<<<<<< HEAD
 // Delete item (admin only)
-=======
-// DELETE /warehouse/:id - Delete item (admin only)
->>>>>>> d11cca6 (first commit)
 router.delete('/:id', authMiddleware, roleMiddleware(['admin']), (req, res) => {
   const itemIndex = items.findIndex(i => i.id === parseInt(req.params.id));
   if (itemIndex === -1) {
@@ -130,7 +102,6 @@ router.delete('/:id', authMiddleware, roleMiddleware(['admin']), (req, res) => {
   res.json({ message: 'Item deleted successfully' });
 });
 
-<<<<<<< HEAD
 // Helper to populate Authorization header from body/query if missing (dev resilience)
 function attachAuthFromPayload(req, res, next) {
   if (!req.headers.authorization) {
@@ -297,7 +268,4 @@ router.post('/import-google', attachAuthFromPayload, authMiddleware, roleMiddlew
     return res.status(500).json({ message: 'Import failed', error: err?.message || String(err) });
   }
 });
-
-=======
->>>>>>> d11cca6 (first commit)
 module.exports = router;

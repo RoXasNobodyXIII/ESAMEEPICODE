@@ -11,12 +11,9 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-<<<<<<< HEAD
   const [showForgot, setShowForgot] = useState(false);
   const [forgotId, setForgotId] = useState('');
   const [forgotMsg, setForgotMsg] = useState('');
-=======
->>>>>>> d11cca6 (first commit)
   const navigate = useNavigate();
 
   const onSubmit = async (e) => {
@@ -53,7 +50,6 @@ const Login = () => {
               {loading ? 'Accesso in corso...' : 'Accedi'}
             </button>
           </form>
-<<<<<<< HEAD
           <div className="d-flex justify-content-between align-items-center mt-3">
             <button className="btn btn-link p-0" onClick={() => { setShowForgot(!showForgot); setForgotMsg(''); }}>Password dimenticata?</button>
           </div>
@@ -77,11 +73,6 @@ const Login = () => {
               </form>
             </div>
           )}
-=======
-          <div className="mt-3 small text-muted">
-            Utenti demo: admin / volontario (password preconfigurate)
-          </div>
->>>>>>> d11cca6 (first commit)
         </div>
       </div>
     </div>
@@ -89,3 +80,4 @@ const Login = () => {
 };
 
 export default Login;
+

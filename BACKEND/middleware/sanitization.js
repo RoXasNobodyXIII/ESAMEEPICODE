@@ -1,10 +1,5 @@
 const helmet = require('helmet');
 
-<<<<<<< HEAD
-
-=======
-// Configure Helmet with security headers
->>>>>>> d11cca6 (first commit)
 const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {

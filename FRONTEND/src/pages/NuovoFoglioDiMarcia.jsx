@@ -42,21 +42,14 @@ const NuovoFoglioDiMarcia = () => {
   const [submitError, setSubmitError] = useState('');
   const [submitOk, setSubmitOk] = useState('');
   const [odoLoading, setOdoLoading] = useState(false);
-<<<<<<< HEAD
   const [vehicles, setVehicles] = useState([]);
   const [vehLoading, setVehLoading] = useState(false);
-=======
->>>>>>> d11cca6 (first commit)
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
     setSubmitOk('');
-<<<<<<< HEAD
     // client-side check
-=======
-    // client-side check: km finali >= iniziali se entrambi presenti
->>>>>>> d11cca6 (first commit)
     const ki = Number(form.kmIniziali);
     const kf = Number(form.kmFinali);
     if (Number.isFinite(ki) && Number.isFinite(kf) && kf < ki) {
@@ -78,10 +71,6 @@ const NuovoFoglioDiMarcia = () => {
     }
   };
 
-<<<<<<< HEAD
-=======
-  // Nessun reset/condizionale: unica tipologia "Servizio Secondario"
->>>>>>> d11cca6 (first commit)
 
   // km mezzo
   useEffect(() => {
@@ -96,7 +85,6 @@ const NuovoFoglioDiMarcia = () => {
       .finally(() => setOdoLoading(false));
   }, [form.mezzo]);
 
-<<<<<<< HEAD
   const loadVehicles = async () => {
     setVehLoading(true);
     try {
@@ -107,8 +95,6 @@ const NuovoFoglioDiMarcia = () => {
   };
   useEffect(() => { loadVehicles(); }, []);
 
-=======
->>>>>>> d11cca6 (first commit)
   return (
     <div>
       <h4 className="mb-3">Foglio Marcia</h4>
@@ -116,11 +102,7 @@ const NuovoFoglioDiMarcia = () => {
       {submitOk && <div className="alert alert-success">{submitOk}</div>}
       <form onSubmit={onSubmit}>
         <div className="row g-3">
-<<<<<<< HEAD
           {/* Tipologia servizio */}
-=======
-          {/* Tipologia servizio fissa */}
->>>>>>> d11cca6 (first commit)
           <div className="col-md-6">
             <label className="form-label">📌 Tipologia servizio</label>
             <input className="form-control" value={form.tipologiaServizio} readOnly />
@@ -137,10 +119,6 @@ const NuovoFoglioDiMarcia = () => {
               <option value="">- SELEZIONA -</option>
               <option>Familiari</option>
               <option>Servizi sociali</option>
-<<<<<<< HEAD
-=======
-              <option>Andata/ritorno postazione</option>
->>>>>>> d11cca6 (first commit)
               <option>Altro</option>
             </select>
           </div>
@@ -152,11 +130,6 @@ const NuovoFoglioDiMarcia = () => {
               <option>Visita</option>
               <option>Trasferimento</option>
               <option>Ricovero o Dimissione</option>
-<<<<<<< HEAD
-=======
-              <option>Andata postazione</option>
-              <option>Ritorno postazione</option>
->>>>>>> d11cca6 (first commit)
               <option>Presidio</option>
               <option>Assist. o Manuten.</option>
             </select>
@@ -237,15 +210,10 @@ const NuovoFoglioDiMarcia = () => {
             <label className="form-label">🚑 Mezzo</label>
             <select className="form-select" value={form.mezzo} onChange={(e) => setField('mezzo', e.target.value)}>
               <option value="">- SELEZIONA -</option>
-<<<<<<< HEAD
               {vehicles.map(v => {
                 const label = `${v.identificativo || ''} - ${v.targa || ''} - ${v.codiceARES || ''}`.replace(/\s+-\s+-\s*$/,'').trim();
                 return <option key={v.id} value={label}>{label}</option>;
               })}
-=======
-              <option>A03 - GG772FV - 1106</option>
-              <option>A04 - GN005MH - 1284</option>
->>>>>>> d11cca6 (first commit)
             </select>
             {odoLoading && <div className="form-text">Lettura chilometraggio...</div>}
           </div>
@@ -302,3 +270,4 @@ const NuovoFoglioDiMarcia = () => {
 };
 
 export default NuovoFoglioDiMarcia;
+

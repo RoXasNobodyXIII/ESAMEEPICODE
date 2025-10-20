@@ -1,7 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-<<<<<<< HEAD
 const crypto = require('crypto');
 const { sendMail } = require('../services/email');
 const router = express.Router();
@@ -12,31 +11,18 @@ if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
 const ACCESS_TTL = process.env.JWT_ACCESS_TTL || '60m';
 const REFRESH_TTL = process.env.JWT_REFRESH_TTL || '14d';
 const APP_PUBLIC_URL = process.env.APP_PUBLIC_URL || process.env.FRONTEND_URL || '';
-=======
-const router = express.Router();
-
-// Temporary for testing
-process.env.JWT_SECRET = process.env.JWT_SECRET || 'testsecret';
-process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'testrefreshsecret';
->>>>>>> d11cca6 (first commit)
 
 // Login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-<<<<<<< HEAD
   const uname = typeof username === 'string' ? username.trim() : '';
   const pword = typeof password === 'string' ? password.trim() : '';
 
   
-=======
-
-  console.log('Login attempt:', username, password);
->>>>>>> d11cca6 (first commit)
 
   try {
     const db = req.app.locals.db;
     const usersCol = db.collection('users');
-<<<<<<< HEAD
     // Try exact username match first, then case-insensitive username, then email (case-insensitive)
     let user = await usersCol.findOne({ username: uname });
     if (!user && uname) {
@@ -73,42 +59,6 @@ router.post('/login', async (req, res) => {
     );
 
     res.json({ accessToken, refreshToken });
-=======
-    const user = await usersCol.findOne({ username });
-    if (!user) {
-      console.log('User not found');
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-  // Allow demo plaintext passwords in dev, fallback to bcrypt hash compare
-  let isValidPassword = false;
-  isValidPassword = await bcrypt.compare(password, user.password);
-  if (!isValidPassword) {
-    if ((user.username === 'admin' && password === 'admin123') ||
-        (user.username === 'volontario' && password === 'volontario123')) {
-      isValidPassword = true;
-    }
-  }
-  console.log('Password valid:', isValidPassword);
-  if (!isValidPassword) {
-    console.log('Invalid password');
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
-
-  const accessToken = jwt.sign(
-    { id: user.id, username: user.username, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: '15m' }
-  );
-
-  const refreshToken = jwt.sign(
-    { id: user.id },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: '7d' }
-  );
-
-  res.json({ accessToken, refreshToken });
->>>>>>> d11cca6 (first commit)
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Internal server error' });
@@ -134,11 +84,7 @@ router.post('/refresh', (req, res) => {
       const newAccessToken = jwt.sign(
         { id: user.id, username: user.username, role: user.role },
         process.env.JWT_SECRET,
-<<<<<<< HEAD
         { expiresIn: ACCESS_TTL }
-=======
-        { expiresIn: '15m' }
->>>>>>> d11cca6 (first commit)
       );
 
       res.json({ accessToken: newAccessToken });
@@ -149,7 +95,6 @@ router.post('/refresh', (req, res) => {
 });
 
 module.exports = router;
-<<<<<<< HEAD
 
 // Forgot password
 router.post('/forgot', async (req, res) => {
@@ -211,5 +156,3 @@ router.post('/reset', async (req, res) => {
     return res.status(500).json({ message: 'Errore reset password' });
   }
 });
-=======
->>>>>>> d11cca6 (first commit)

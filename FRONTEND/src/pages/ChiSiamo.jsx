@@ -19,15 +19,13 @@ const ChiSiamo = () => {
       <p>
         Il nostro team è composto da volontari qualificati, medici, infermieri e operatori di protezione civile, tutti uniti dalla passione per il servizio e la comunità.
       </p>
-<<<<<<< HEAD
       <h2>Appartenenza ad ANPAS</h2>
       <p>
         Facciamo orgogliosamente parte di <strong>ANPAS</strong>, l’Associazione Nazionale Pubbliche Assistenze, che riunisce realtà impegnate nel volontariato, nella solidarietà e nella protezione civile.
       </p>
-=======
->>>>>>> d11cca6 (first commit)
     </div>
   );
 };
 
 export default ChiSiamo;
+

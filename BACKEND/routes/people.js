@@ -6,11 +6,6 @@ function getPeopleCol(req) {
   return req.app.locals.db.collection('people');
 }
 
-<<<<<<< HEAD
-
-=======
-// GET /people - Authenticated users can see the list
->>>>>>> d11cca6 (first commit)
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const people = await getPeopleCol(req).find({}, { projection: { _id: 0 } }).toArray();
