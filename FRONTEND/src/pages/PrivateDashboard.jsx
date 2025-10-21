@@ -41,7 +41,19 @@ const PrivateDashboard = () => {
       </div>
 
       <ul className="nav flex-wrap mb-3">
-        <NavItem to="/private/calendar" label="Calendario turni" />
+        <li className="nav-item dropdown me-2 mb-2">
+          <button
+            className={`btn btn-sm dropdown-toggle ${location.pathname.startsWith('/private/calendar') ? 'btn-primary' : 'btn-outline-primary'}`}
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Calendario turni
+          </button>
+          <ul className="dropdown-menu">
+            <li><Link className="dropdown-item" to="/private/calendar?view=118">118</Link></li>
+            <li><Link className="dropdown-item" to="/private/calendar?view=secondari">Servizi Secondari</Link></li>
+          </ul>
+        </li>
         <NavItem to="/private/magazzino" label="Magazzino" />
         
         <li className="nav-item dropdown me-2 mb-2">

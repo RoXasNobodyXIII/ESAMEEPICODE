@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 function Calendar() {
   useEffect(() => {
     document.title = 'Calendario turni';
   }, []);
 
-  // Calendari: 118 (Google Sheets) e Servizi Secondari (Excel on web)
+  // Calendari: 118 (Google Sheets) e Servizi Secondari
   const SHEET_118_EMBED_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQUjQS5bQnFA-rXWhw1V2WeXKTg6dBs8yVZyh-ZzQMZLSClJrtL07hzUx_p2FX0gg/pubhtml';
   const SHEET_118_OPEN_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQUjQS5bQnFA-rXWhw1V2WeXKTg6dBs8yVZyh-ZzQMZLSClJrtL07hzUx_p2FX0gg/pubhtml';
   const SHEET_SECONDARI_EMBED_URL = '';
@@ -14,19 +15,19 @@ function Calendar() {
 
   const [cacheKey, setCacheKey] = useState(() => Date.now());
   const refreshEmbed = () => setCacheKey(Date.now());
+  const location = useLocation();
   const [view, setView] = useState('118');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const v = (params.get('view') || '').toLowerCase();
+    if (v === 'secondari') setView('secondari');
+    else setView('118');
+  }, [location.search]);
 
   return (
     <div>
       <h4>Calendario turni</h4>
-      <ul className="nav nav-pills mb-3">
-        <li className="nav-item me-2">
-          <button className={`btn btn-sm ${view==='118' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={()=>setView('118')}>118</button>
-        </li>
-        <li className="nav-item">
-          <button className={`btn btn-sm ${view==='secondari' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={()=>setView('secondari')}>Servizi Secondari (Excel)</button>
-        </li>
-      </ul>
 
       <div className="d-flex align-items-center justify-content-between mb-2">
         <small className="text-muted">Ultimo aggiornamento incorporato: {new Date(cacheKey).toLocaleTimeString()}</small>

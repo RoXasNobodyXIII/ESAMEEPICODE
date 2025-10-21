@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+const bcrypt = require('bcryptjs');
 
 const uri = process.env.MONGODB_URI;
 const DB_NAME = process.env.MONGODB_DB || 'sudpontino';
@@ -33,39 +34,51 @@ async function seedIfNeeded(db) {
   };
   // Ensure admin exists
   const admin = await usersCol.findOne({ username: 'admin' });
+  const adminPassword = process.env.ADMIN_PASSWORD;
   if (!admin) {
     const nextId = await getNextId();
+    const hashed = adminPassword ? await bcrypt.hash(String(adminPassword), 10) : '$2a$10$Y7s2IECmU/LVyUVYGUzlpuC7MVySDRWKG1S3o7iwGVOsEmx.42VrG';
     await usersCol.updateOne(
       { username: 'admin' },
       {
         $setOnInsert: {
           id: nextId,
           username: 'admin',
-          password: '$2a$10$Y7s2IECmU/LVyUVYGUzlpuC7MVySDRWKG1S3o7iwGVOsEmx.42VrG',
+          password: hashed,
           role: 'admin',
           email: 'admin@example.com',
         },
       },
       { upsert: true }
     );
+  } else if (adminPassword) {
+    const hashed = await bcrypt.hash(String(adminPassword), 10);
+    await usersCol.updateOne({ username: 'admin' }, { $set: { password: hashed } });
   }
   // Ensure volontario exists
   const vol = await usersCol.findOne({ username: 'volontario' });
   if (!vol) {
     const nextId = await getNextId();
+    const volontarioPassword = process.env.VOLONTARIO_PASSWORD;
+    const volHashed = volontarioPassword
+      ? await bcrypt.hash(String(volontarioPassword), 10)
+      : '$2a$10$b0TyfM5Oftowzndxpu3rUeBs2KoRg6DxtMIOKxipmq7b6B3rR97U6';
     await usersCol.updateOne(
       { username: 'volontario' },
       {
         $setOnInsert: {
           id: nextId,
           username: 'volontario',
-          password: '$2a$10$b0TyfM5Oftowzndxpu3rUeBs2KoRg6DxtMIOKxipmq7b6B3rR97U6',
+          password: volHashed,
           role: 'volontario',
           email: 'volontario@example.com',
         },
       },
       { upsert: true }
     );
+  } else if (process.env.VOLONTARIO_PASSWORD) {
+    const volHashed = await bcrypt.hash(String(process.env.VOLONTARIO_PASSWORD), 10);
+    await usersCol.updateOne({ username: 'volontario' }, { $set: { password: volHashed } });
   }
 
   // People

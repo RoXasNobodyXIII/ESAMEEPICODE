@@ -25,7 +25,11 @@ const Login = () => {
       setTokens(data.accessToken, data.refreshToken);
       navigate('/private');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const msg = err?.response?.data?.message
+            || (err?.request ? 'Impossibile contattare il server. Verifica che il backend sia avviato.' : null)
+            || (typeof err?.message === 'string' && /Network|timeout|ECONN|ERR_NETWORK/i.test(err.message) ? 'Impossibile contattare il server. Verifica che il backend sia avviato.' : null)
+            || 'Login failed';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -80,4 +84,3 @@ const Login = () => {
 };
 
 export default Login;
-

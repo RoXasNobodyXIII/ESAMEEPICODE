@@ -18,12 +18,10 @@ router.post('/login', async (req, res) => {
   const uname = typeof username === 'string' ? username.trim() : '';
   const pword = typeof password === 'string' ? password.trim() : '';
 
-  
-
   try {
     const db = req.app.locals.db;
     const usersCol = db.collection('users');
-    // Try exact username match first, then case-insensitive username, then email (case-insensitive)
+    
     let user = await usersCol.findOne({ username: uname });
     if (!user && uname) {
       const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -41,7 +39,20 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ message: 'Account sospeso. Contatta un amministratore.' });
     }
 
-    const isValidPassword = await bcrypt.compare(pword, user.password);
+    
+    let isValidPassword = false;
+    if (typeof user.password === 'string' && user.password.startsWith('$2')) {
+      isValidPassword = await bcrypt.compare(pword, user.password);
+    } else {
+      isValidPassword = pword === user.password;
+      if (isValidPassword) {
+        try {
+          const newHash = await bcrypt.hash(pword, 10);
+          await usersCol.updateOne({ id: user.id }, { $set: { password: newHash } });
+          user.password = newHash;
+        } catch (_) {}
+      }
+    }
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -74,7 +85,7 @@ router.post('/refresh', (req, res) => {
 
   try {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    // Validate user still exists
+
     const db = req.app.locals.db;
     db.collection('users').findOne({ id: decoded.id }).then(user => {
       if (!user) {

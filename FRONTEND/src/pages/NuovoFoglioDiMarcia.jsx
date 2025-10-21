@@ -44,6 +44,7 @@ const NuovoFoglioDiMarcia = () => {
   const [odoLoading, setOdoLoading] = useState(false);
   const [vehicles, setVehicles] = useState([]);
   const [vehLoading, setVehLoading] = useState(false);
+  const [selectedVehicleId, setSelectedVehicleId] = useState('');
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +59,9 @@ const NuovoFoglioDiMarcia = () => {
     }
     setSubmitting(true);
     try {
-      const { data } = await api.post('/fogli-marcia', form);
+      const payload = { ...form };
+      if (selectedVehicleId) payload.vehicleId = selectedVehicleId;
+      const { data } = await api.post('/fogli-marcia', payload);
       const code = data.serviceCode || `#${data.id}`;
       setSubmitOk(`Creato foglio ${code}`);
     } catch (err) {
@@ -208,11 +211,21 @@ const NuovoFoglioDiMarcia = () => {
           {/* Mezzo e KM */}
           <div className="col-md-6">
             <label className="form-label">🚑 Mezzo</label>
-            <select className="form-select" value={form.mezzo} onChange={(e) => setField('mezzo', e.target.value)}>
+            <select
+              className="form-select"
+              value={selectedVehicleId}
+              onChange={(e) => {
+                const id = e.target.value;
+                setSelectedVehicleId(id);
+                const v = vehicles.find(x => String(x.id) === String(id));
+                const label = v ? `${v.identificativo || ''} - ${v.targa || ''} - ${v.codiceARES || ''}`.replace(/\s+-\s+-\s*$/,'').trim() : '';
+                setField('mezzo', label);
+              }}
+            >
               <option value="">- SELEZIONA -</option>
               {vehicles.map(v => {
                 const label = `${v.identificativo || ''} - ${v.targa || ''} - ${v.codiceARES || ''}`.replace(/\s+-\s+-\s*$/,'').trim();
-                return <option key={v.id} value={label}>{label}</option>;
+                return <option key={v.id} value={String(v.id)}>{label}</option>;
               })}
             </select>
             {odoLoading && <div className="form-text">Lettura chilometraggio...</div>}

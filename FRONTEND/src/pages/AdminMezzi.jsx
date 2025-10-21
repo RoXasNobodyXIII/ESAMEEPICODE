@@ -57,13 +57,12 @@ const AdminMezzi = () => {
 
       <div className="card">
         <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center mb-2">
+          <div className="d-flex justify-content-start align-items-center mb-2">
             <h5 className="mb-0">Elenco mezzi</h5>
-            <button className="btn btn-outline-secondary btn-sm" onClick={load} disabled={loading}>{loading ? 'Aggiorno...' : 'Ricarica'}</button>
           </div>
           <div className="d-none d-md-block">
             <div className="table-responsive">
-              <table className="table table-sm align-middle">
+              <table className="table table-sm align-middle table-hover">
                 <thead>
                   <tr>
                     <th>ID</th><th>Targa</th><th>Tipologia</th><th></th>
@@ -76,7 +75,7 @@ const AdminMezzi = () => {
                       <td>{v.targa || '-'}</td>
                       <td>{v.tipologia || '-'}</td>
                       <td className="text-end">
-                        <Link className="btn btn-sm btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">
+                        <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">
                           <span aria-hidden="true">⚙️</span>
                         </Link>
                       </td>
@@ -92,13 +91,13 @@ const AdminMezzi = () => {
           <div className="d-md-none">
             <div className="list-group">
               {list.map(v => (
-                <div key={v.id} className="list-group-item">
+                <div key={v.id} className="list-group-item py-3">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
                       <div><strong>#{v.id}</strong> · {v.targa || '-'} </div>
                       <div className="small text-muted">{v.tipologia || '-'}</div>
                     </div>
-                    <Link className="btn btn-sm btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">⚙️</Link>
+                    <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">⚙️</Link>
                   </div>
                 </div>
               ))}
@@ -146,3 +145,4 @@ const AdminMezzi = () => {
 };
 
 export default AdminMezzi;
+

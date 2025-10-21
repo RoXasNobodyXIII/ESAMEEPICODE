@@ -2,6 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
 const authRoutes = require('./routes/auth');
 const protectedRoutes = require('./routes/protected');
 const userRoutes = require('./routes/users');
@@ -11,6 +12,7 @@ const reportRoutes = require('./routes/reports');
 const peopleRoutes = require('./routes/people');
 const fogliMarciaRoutes = require('./routes/fogliMarcia');
 const emailRoutes = require('./routes/email');
+const vehiclesRoutes = require('./routes/vehicles');
 const { requestLogger } = require('./middleware/logging');
 const { generalLimiter, authLimiter } = require('./middleware/rateLimit');
 const securityHeaders = require('./middleware/sanitization');
@@ -26,8 +28,8 @@ app.use(generalLimiter);
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/auth', authLimiter, authRoutes);
+
+app.use('/auth', authRoutes);
 app.use('/protected', protectedRoutes);
 app.use('/users', userRoutes);
 app.use('/warehouse', warehouseRoutes);
@@ -36,11 +38,37 @@ app.use('/reports', reportRoutes);
 app.use('/people', peopleRoutes);
 app.use('/fogli-marcia', fogliMarciaRoutes);
 app.use('/email', emailRoutes);
+app.use('/vehicles', vehiclesRoutes);
 
 // Start server only after DB connection
 connectToDB()
-  .then(() => {
+  .then(async () => {
     app.locals.db = getDB();
+    try {
+      const usersCol = app.locals.db.collection('users');
+      const count = await usersCol.countDocuments();
+      if (count === 0) {
+        const username = process.env.DEFAULT_ADMIN_USERNAME || 'admin';
+        const email = process.env.DEFAULT_ADMIN_EMAIL || 'admin@example.com';
+        const plain = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
+        const hashed = await bcrypt.hash(plain, 10);
+        const existingMax = await usersCol
+          .find({}, { projection: { id: 1 } })
+          .sort({ id: -1 })
+          .limit(1)
+          .toArray();
+        const nextId = existingMax.length ? (Number(existingMax[0].id) || 0) + 1 : 1;
+        await usersCol.insertOne({
+          id: nextId,
+          username,
+          password: hashed,
+          email,
+          role: 'admin',
+          suspended: false
+        });
+        console.log('Seeded default admin user');
+      }
+    } catch (e) {}
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
@@ -49,3 +77,4 @@ connectToDB()
     console.error('Failed to connect to MongoDB:', err);
     process.exit(1);
   });
+
