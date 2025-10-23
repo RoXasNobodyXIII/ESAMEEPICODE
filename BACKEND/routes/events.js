@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDB } = require('../services/db');
+// Using req.app.locals.db provided by server after connectToDB()
 
 const router = express.Router();
 
@@ -21,13 +21,14 @@ function sanitizeEvent(input) {
 // List events (public). Optional query: includeAll=true to include drafts
 router.get('/', async (req, res) => {
   try {
-    const db = getDB();
+    const db = req.app.locals.db;
     const col = db.collection(COLLECTION);
     const includeAll = String(req.query.includeAll || 'false') === 'true';
     const filter = includeAll ? {} : { status: { $ne: 'bozza' } };
     const items = await col.find(filter).sort({ date: 1, time: 1 }).toArray();
     res.json(items);
   } catch (err) {
+    console.error('GET /events failed:', err?.message || err);
     res.status(500).json({ error: 'Failed to list events' });
   }
 });
@@ -35,12 +36,13 @@ router.get('/', async (req, res) => {
 // Get event by id (public)
 router.get('/:id', async (req, res) => {
   try {
-    const db = getDB();
+    const db = req.app.locals.db;
     const col = db.collection(COLLECTION);
     const ev = await col.findOne({ id: String(req.params.id) });
     if (!ev) return res.status(404).json({ error: 'Not found' });
     res.json(ev);
   } catch (err) {
+    console.error('GET /events/:id failed:', err?.message || err);
     res.status(500).json({ error: 'Failed to get event' });
   }
 });
@@ -48,7 +50,7 @@ router.get('/:id', async (req, res) => {
 // Create event
 router.post('/', async (req, res) => {
   try {
-    const db = getDB();
+    const db = req.app.locals.db;
     const col = db.collection(COLLECTION);
     const data = sanitizeEvent(req.body || {});
     data.id = data.id || generateId();
@@ -57,6 +59,7 @@ router.post('/', async (req, res) => {
     await col.insertOne(data);
     res.status(201).json(data);
   } catch (err) {
+    console.error('POST /events failed:', err?.message || err);
     res.status(500).json({ error: 'Failed to create event' });
   }
 });
@@ -64,7 +67,7 @@ router.post('/', async (req, res) => {
 // Update event
 router.put('/:id', async (req, res) => {
   try {
-    const db = getDB();
+    const db = req.app.locals.db;
     const col = db.collection(COLLECTION);
     const data = sanitizeEvent(req.body || {});
     data.updatedAt = new Date();
@@ -76,6 +79,7 @@ router.put('/:id', async (req, res) => {
     if (!value) return res.status(404).json({ error: 'Not found' });
     res.json(value);
   } catch (err) {
+    console.error('PUT /events/:id failed:', err?.message || err);
     res.status(500).json({ error: 'Failed to update event' });
   }
 });
@@ -83,12 +87,13 @@ router.put('/:id', async (req, res) => {
 // Delete event
 router.delete('/:id', async (req, res) => {
   try {
-    const db = getDB();
+    const db = req.app.locals.db;
     const col = db.collection(COLLECTION);
     const result = await col.deleteOne({ id: String(req.params.id) });
     if (result.deletedCount === 0) return res.status(404).json({ error: 'Not found' });
     res.json({ ok: true });
   } catch (err) {
+    console.error('DELETE /events/:id failed:', err?.message || err);
     res.status(500).json({ error: 'Failed to delete event' });
   }
 });

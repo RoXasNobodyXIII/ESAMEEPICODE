@@ -56,6 +56,15 @@ async function seedIfNeeded(db) {
   try {
     await fmCol.createIndex({ serviceCode: 1 }, { name: 'idx_service_code' });
   } catch (_) {  }
+
+  // Events
+  const evCol = db.collection('events');
+  try {
+    await evCol.createIndex({ id: 1 }, { unique: true, name: 'uniq_event_id' });
+  } catch (_) { }
+  try {
+    await evCol.createIndex({ date: 1, time: 1 }, { name: 'idx_event_date_time' });
+  } catch (_) { }
 }
 
 function getDB() {
