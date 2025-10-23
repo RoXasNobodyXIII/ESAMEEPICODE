@@ -1,11 +1,27 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getEvent } from '../utils/eventsStore';
+import { getEvent as fetchEvent } from '../utils/eventsApi';
 
 const EventDetail = () => {
   const { id } = useParams();
-  const ev = getEvent(id);
+  const [ev, setEv] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchEvent(id);
+        if (mounted) setEv(data || null);
+      } catch (_) {
+        if (mounted) setEv(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [id]);
 
+  if (loading) return <div className="container mt-5"><div className="text-muted">Caricamento…</div></div>;
   if (!ev) return (
     <div className="container mt-5">
       <div className="alert alert-warning">Evento non trovato.</div>

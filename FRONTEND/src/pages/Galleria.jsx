@@ -1,18 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { listEvents } from '../utils/eventsStore';
+import { listEvents as fetchEvents } from '../utils/eventsApi';
 
 const Galleria = () => {
   React.useEffect(() => {
     document.title = "GALLERIA";
   }, []);
 
-  const items = React.useMemo(() => {
-    const evs = listEvents();
-    return (evs || [])
-      .filter(e => e && e.image && e.status !== 'bozza')
-      .map(e => ({ id: e.id, title: e.title, image: e.image, date: e.date }))
-      .sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+  const [items, setItems] = React.useState([]);
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const evs = await fetchEvents(false);
+        const mapped = (evs || [])
+          .filter(e => e && e.image && e.status !== 'bozza')
+          .map(e => ({ id: e.id, title: e.title, image: e.image, date: e.date }))
+          .sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+        if (mounted) setItems(mapped);
+      } catch (_) {
+        if (mounted) setItems([]);
+      }
+    })();
+    return () => { mounted = false; };
   }, []);
 
   return (

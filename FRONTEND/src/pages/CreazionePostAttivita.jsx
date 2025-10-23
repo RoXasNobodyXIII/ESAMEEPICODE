@@ -1,6 +1,6 @@
 import React from 'react';
-import { generateId, upsertEvent } from '../utils/eventsStore';
 import api from '../api';
+import { createEvent } from '../utils/eventsApi';
 
 const CreazionePostAttivita = () => {
   const [allowed, setAllowed] = React.useState(null);
@@ -56,11 +56,9 @@ const CreazionePostAttivita = () => {
     }
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    const id = generateId();
-    const ev = {
-      id,
+    const payload = {
       type: 'attivita',
       title: form.title,
       date: form.date,
@@ -71,8 +69,10 @@ const CreazionePostAttivita = () => {
       link: form.link,
       status: form.status
     };
-    upsertEvent(ev);
-    reset();
+    try {
+      await createEvent(payload);
+      reset();
+    } catch (_) {}
   };
 
   if (loading) return <div className="container mt-4"><div className="text-muted">Caricamento…</div></div>;

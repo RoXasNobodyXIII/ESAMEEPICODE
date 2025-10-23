@@ -1,32 +1,54 @@
 import React from 'react';
-import { listEvents, upsertEvent, deleteEvent } from '../utils/eventsStore';
 import { getUserRole } from '../auth';
+import { listEvents as fetchEvents, updateEvent as apiUpdateEvent, deleteEvent as apiDeleteEvent } from '../utils/eventsApi';
 
 const PrivateEventEditor = () => {
   const role = getUserRole();
   const canEdit = role === 'admin';
-  const [items, setItems] = React.useState(listEvents());
+  const [items, setItems] = React.useState([]);
   const [form, setForm] = React.useState(null);
 
   const reset = () => setForm(null);
 
   if (!canEdit) return <div className="container mt-4"><div className="alert alert-warning">Non autorizzato.</div></div>;
 
-  const onSubmit = (e) => {
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchEvents(true);
+        if (mounted) setItems(Array.isArray(data) ? data : []);
+      } catch (_) {
+        if (mounted) setItems([]);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const onSubmit = async (e) => {
     e.preventDefault();
     if (!form?.id) return;
     const ev = { ...form };
     delete ev.image;
-    upsertEvent(ev);
-    setItems(listEvents());
-    reset();
+    try {
+      await apiUpdateEvent(form.id, ev);
+      const data = await fetchEvents(true);
+      setItems(Array.isArray(data) ? data : []);
+      reset();
+    } catch (_) {}
   };
 
   const onEdit = (ev) => {
     const images = Array.isArray(ev.images) ? ev.images : (ev.image ? [ev.image] : []);
     setForm({ ...ev, images });
   };
-  const onDelete = (id) => { deleteEvent(id); setItems(listEvents()); };
+  const onDelete = async (id) => {
+    try {
+      await apiDeleteEvent(id);
+      const data = await fetchEvents(true);
+      setItems(Array.isArray(data) ? data : []);
+    } catch (_) {}
+  };
 
   return (
     <div className="container mt-4">
