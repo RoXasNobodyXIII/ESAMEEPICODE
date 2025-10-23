@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 5002;
 app.use(securityHeaders);
 app.use(requestLogger);
 app.use(generalLimiter);
-app.use(cors({ origin: ['https://crocedorosudpontino.onrender.com/'] }));
+app.use(cors({ origin: ['https://crocedorosudpontino.onrender.com'] }));
 app.use(express.json());
 
 
