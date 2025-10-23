@@ -41,8 +41,10 @@ const AdminMezzi = () => {
       setShowModal(false);
       setNewV({ identificativo: '', targa: '', codiceARES: '' });
       await load();
-      if (data?.id) navigate(`/private/tools/amministrazione/mezzi/${data.id}`);
-      else setMsg('Mezzo creato');
+      if (data?.id) {
+        window.open(`/private/tools/amministrazione/mezzi/${data.id}`, '_blank', 'noopener');
+        setMsg('Mezzo creato');
+      } else setMsg('Mezzo creato');
     } catch (e) { setError(e?.response?.data?.message || 'Errore creazione mezzo'); }
   };
 
@@ -75,7 +77,7 @@ const AdminMezzi = () => {
                       <td>{v.targa || '-'}</td>
                       <td>{v.codiceARES || '-'}</td>
                       <td className="text-end">
-                        <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">
+                        <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione" target="_blank" rel="noreferrer">
                           <span aria-hidden="true">⚙️</span>
                         </Link>
                       </td>
@@ -97,7 +99,7 @@ const AdminMezzi = () => {
                       <div><strong>#{v.id}</strong> · {v.targa || '-'} </div>
                       <div className="small text-muted">{v.codiceARES || '-'}</div>
                     </div>
-                    <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">⚙️</Link>
+                    <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione" target="_blank" rel="noreferrer">⚙️</Link>
                   </div>
                 </div>
               ))}

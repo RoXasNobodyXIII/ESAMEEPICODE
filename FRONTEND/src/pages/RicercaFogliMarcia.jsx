@@ -23,6 +23,18 @@ const RicercaFogliMarcia = () => {
   const [vehicles, setVehicles] = useState([]);
   const [vehLoading, setVehLoading] = useState(false);
 
+  const onlyTime = (v) => {
+    if (!v) return '-';
+    try {
+      const dt = new Date(v);
+      if (!Number.isNaN(dt.getTime())) {
+        return dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      }
+    } catch (_) {}
+    const m = String(v).match(/T(\d{2}:\d{2})/);
+    return m ? m[1] : String(v);
+  };
+
   const search = async (e) => {
     if (e) e.preventDefault();
     setError('');
@@ -97,7 +109,7 @@ const RicercaFogliMarcia = () => {
             <input type="date" className="form-control" value={day} onChange={(e) => setDay(e.target.value)} />
           </div>
         )}
-        <div className="col-md-5"></div>
+        <div className="col-md-2"></div>
         <div className="col-md-6">
           <label className="form-label">🛣 Indirizzo</label>
           <input className="form-control" value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} placeholder="Cerca per indirizzo" />
@@ -144,7 +156,7 @@ const RicercaFogliMarcia = () => {
                             <tr key={f._id || f.id}>
                               <td style={{whiteSpace:'nowrap'}}>{f.serviceCode || `#${f.id}`}</td>
                               <td>{f.indirizzo || '-'}</td>
-                              <td>{f.uscita || '-'}</td>
+                              <td>{onlyTime(f.uscita)}</td>
                               <td>{f.fine || '-'}</td>
                               <td>{f.esito || '-'}</td>
                             </tr>
@@ -162,7 +174,7 @@ const RicercaFogliMarcia = () => {
                           </div>
                           <div className="small text-muted">{f.indirizzo || '-'}</div>
                           <div className="mt-1">
-                            <span className="badge bg-light text-dark me-1">Partenza: {f.uscita || '-'}</span>
+                            <span className="badge bg-light text-dark me-1">Partenza: {onlyTime(f.uscita)}</span>
                             <span className="badge bg-light text-dark me-1">Fine: {f.fine || '-'}</span>
                             <span className="badge bg-secondary">{f.esito || '-'}</span>
                           </div>

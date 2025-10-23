@@ -13,6 +13,9 @@ const EventDetail = () => {
     </div>
   );
 
+  const images = (Array.isArray(ev.images) && ev.images.length > 0) ? ev.images : (ev.image ? [ev.image] : []);
+  const [active, setActive] = React.useState(0);
+
   return (
     <div className="container mt-5">
       <Link to="/news" className="btn btn-sm btn-outline-secondary mb-3">← Calendario</Link>
@@ -31,9 +34,30 @@ const EventDetail = () => {
               )}
             </div>
           </div>
-          {ev.image && (
-            <div className="mb-3"><img src={ev.image} alt={ev.title} className="img-fluid" /></div>
+
+          {images.length > 0 && (
+            <div className="event-gallery mb-3">
+              <div className="event-gallery__main mb-2">
+                <img src={images[Math.min(active, images.length-1)]} alt={ev.title} className="img-fluid event-gallery__img" />
+              </div>
+              {images.length > 1 && (
+                <div className="row g-2">
+                  {images.map((src, idx) => (
+                    <div key={idx} className="col-3 col-md-2">
+                      <img
+                        src={src}
+                        alt={`thumb-${idx}`}
+                        className={`event-gallery__thumb img-fluid ${idx===active? 'border border-2 border-warning' : ''}`}
+                        onClick={() => setActive(idx)}
+                        role="button"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
+
           {ev.description && <p>{ev.description}</p>}
           {ev.link && <a href={ev.link} target="_blank" rel="noreferrer" className="btn btn-primary">Approfondisci</a>}
         </div>

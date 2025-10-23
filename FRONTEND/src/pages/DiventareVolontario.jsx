@@ -14,7 +14,7 @@ const DiventareVolontario = () => {
             <div className="volontario-showcase__media">
               <img
                 className="volontario-showcase__img"
-                src="https://res.cloudinary.com/dkbahjqa6/image/upload/v1761064040/IMG-20251020-WA0028_yzjkwl.jpg"
+                src="https://res.cloudinary.com/dkbahjqa6/image/upload/v1761251973/CERCHIAMO_INFERMIERI_jywywx.jpg"
                 alt="Diventa volontario - Croce d'Oro Sud Pontino"
                 loading="lazy"
               />
@@ -24,7 +24,7 @@ const DiventareVolontario = () => {
         <div className="col-md-6 d-flex">
           <div className="card flex-fill">
             <div className="card-body">
-              <p className="text-muted mb-4">Requisiti, iter di iscrizione, formazione iniziale e contatti per candidarsi come volontario.</p>
+              <p className="text-muted mb-4">Vuoi entrare a far parte della nostra Associazione? Compila il modulo di iscrizione, partecipa al colloquio e inizia il tuo percorso con noi!</p>
               <a href="/moduli/modulo-iscrizione.pdf" className="btn btn-primary" download>
                 Scarica modulo di iscrizione (PDF)
               </a>

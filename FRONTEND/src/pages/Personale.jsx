@@ -594,21 +594,95 @@ const Personale = () => {
                 <div className="mb-3">
                   <label className="form-label">Permessi</label>
                   <div className="row g-3">
-                    
-                    <div className="col-12">
-                      <div className="row g-2">
+                    <div className="col-12 mt-2">
+                      <div className="mb-1 fw-semibold">Foglio di marcia</div>
+                      <div className="row g-3 align-items-center">
                         {[
-                          ['soccorsi','Foglio di marcia'],
-                          ['ferie','Ferie'],
-                          ['amministrazione','Amministrazione']
-                        ].map(([key,label]) => (
-                          <div className="col-auto" key={key}>
-                            <div className="form-check">
-                              <input id={`edit-perm-${key}`} className="form-check-input" type="checkbox" checked={!!editData.permessi?.[key]} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, [key]: e.target.checked } })} />
-                              <label className="form-check-label" htmlFor={`edit-perm-${key}`}>{label}</label>
+                          ['inserire','➕','Inserisci Soccorso'],
+                          ['elenco','📋','Elenco Soccorsi'],
+                          ['ricerca','🔎','Ricerca'],
+                          ['report','📊','Report']
+                        ].map(([k,icon,label]) => (
+                          <div className="col-auto" key={`edit-soccorsi-${k}`}>
+                            <div className="form-check d-flex align-items-center gap-2">
+                              <input id={`edit-pm-soccorsi-${k}`} className="form-check-input" type="checkbox" checked={!!editData.permessi?.soccorsi?.[k]} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, soccorsi: { ...(editData.permessi?.soccorsi||{}), [k]: e.target.checked } } })} />
+                              <label className="form-check-label d-flex align-items-center gap-1" htmlFor={`edit-pm-soccorsi-${k}`}>
+                                <span aria-hidden="true">{icon}</span>
+                                <span>{label}</span>
+                              </label>
                             </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+
+                    <div className="col-12 mt-3">
+                      <div className="mb-1 fw-semibold">Fogli Marcia - Avanzati</div>
+                      <div className="row g-3 align-items-center">
+                        {[
+                          ['inserire','➕','Inserire'],
+                          ['elenco','📋','Elenco'],
+                          ['ricerca','🔎','Ricerca'],
+                          ['modifica','✎','Modifica'],
+                          ['altro','⋯','Altro'],
+                          ['tutto','✓','Tutto']
+                        ].map(([k,icon,label]) => (
+                          <div className="col-auto" key={`edit-fm-${k}`}>
+                            <div className="form-check d-flex align-items-center gap-2">
+                              <input id={`edit-pm-fm-${k}`} className="form-check-input" type="checkbox" checked={!!editData.permessi?.fogliMarcia?.[k]} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, fogliMarcia: { ...(editData.permessi?.fogliMarcia||{}), [k]: e.target.checked } } })} />
+                              <label className="form-check-label d-flex align-items-center gap-1" htmlFor={`edit-pm-fm-${k}`}>
+                                <span aria-hidden="true">{icon}</span>
+                                <span>{label}</span>
+                              </label>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="col-12 mt-3">
+                      <div className="mb-1 fw-semibold">Amministrazione</div>
+                      <div className="row g-3 align-items-center">
+                        {[
+                          ['utenti','👤','Utenti'],
+                          ['materiale','🧰','Materiale'],
+                          ['mezzi','🚐','Mezzi'],
+                          ['impostazioni','⚙️','Impostazioni']
+                        ].map(([k,icon,label]) => (
+                          <div className="col-auto" key={`edit-amm-${k}`}>
+                            <div className="form-check d-flex align-items-center gap-2">
+                              <input id={`edit-pm-amm-${k}`} className="form-check-input" type="checkbox" checked={!!editData.permessi?.amministrazione?.[k]} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, amministrazione: { ...(editData.permessi?.amministrazione||{}), [k]: e.target.checked } } })} />
+                              <label className="form-check-label d-flex align-items-center gap-1" htmlFor={`edit-pm-amm-${k}`}>
+                                <span aria-hidden="true">{icon}</span>
+                                <span>{label}</span>
+                              </label>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="col-12 mt-3">
+                      <div className="mb-1 fw-semibold">Sito</div>
+                      <div className="row g-3 align-items-center">
+                        <div className="col-auto">
+                          <div className="form-check d-flex align-items-center gap-2">
+                            <input id="edit-pm-sito-gestione" className="form-check-input" type="checkbox" checked={!!editData.permessi?.sito?.gestione} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, sito: { gestione: e.target.checked } } })} />
+                            <label className="form-check-label" htmlFor="edit-pm-sito-gestione">Gestione sito</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-12 mt-3">
+                      <div className="mb-1 fw-semibold">Calendario</div>
+                      <div className="row g-3 align-items-center">
+                        <div className="col-auto">
+                          <div className="form-check d-flex align-items-center gap-2">
+                            <input id="edit-pm-cal-view" className="form-check-input" type="checkbox" checked={!!editData.permessi?.calendar?.view} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, calendar: { view: e.target.checked } } })} />
+                            <label className="form-check-label" htmlFor="edit-pm-cal-view">Solo visualizzazione calendario</label>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -636,12 +710,6 @@ const Personale = () => {
                       <div className="form-check">
                         <input id="edit-st-vol" className="form-check-input" type="checkbox" checked={!!editData.stato?.volontario} onChange={(e) => setEditData({ ...editData, stato: { ...(editData.stato || {}), volontario: e.target.checked } })} />
                         <label htmlFor="edit-st-vol" className="form-check-label">Volontario</label>
-                      </div>
-                    </div>
-                    <div className="col-auto">
-                      <div className="form-check">
-                        <input id="edit-st-att" className="form-check-input" type="checkbox" checked={!!editData.stato?.attivo} onChange={(e) => setEditData({ ...editData, stato: { ...(editData.stato || {}), attivo: e.target.checked } })} />
-                        <label htmlFor="edit-st-att" className="form-check-label">Attivo</label>
                       </div>
                     </div>
                   </div>

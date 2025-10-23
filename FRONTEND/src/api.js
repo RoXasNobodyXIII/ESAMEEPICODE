@@ -2,15 +2,7 @@ import axios from 'axios';
 import { getAccessToken, getRefreshToken, isTokenExpired, setTokens, clearTokens } from './auth';
 
 const envBase = (import.meta.env?.VITE_API_BASE || '').trim();
-let baseURL = envBase;
-if (!baseURL) {
-  if (import.meta.env.DEV) {
-    baseURL = 'http://localhost:5002';
-  } else if (import.meta.env.PROD) {
-    console.warn('[api] VITE_API_BASE is not set. Falling back to http://localhost:5002. Set VITE_API_BASE to your backend URL for production.');
-    baseURL = 'http://localhost:5002';
-  }
-}
+const baseURL = envBase;
 
 const api = axios.create({ baseURL });
 

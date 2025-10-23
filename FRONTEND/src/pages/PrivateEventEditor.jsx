@@ -16,12 +16,16 @@ const PrivateEventEditor = () => {
     e.preventDefault();
     if (!form?.id) return;
     const ev = { ...form };
+    delete ev.image;
     upsertEvent(ev);
     setItems(listEvents());
     reset();
   };
 
-  const onEdit = (ev) => setForm(ev);
+  const onEdit = (ev) => {
+    const images = Array.isArray(ev.images) ? ev.images : (ev.image ? [ev.image] : []);
+    setForm({ ...ev, images });
+  };
   const onDelete = (id) => { deleteEvent(id); setItems(listEvents()); };
 
   return (
@@ -66,8 +70,30 @@ const PrivateEventEditor = () => {
                       <input className="form-control" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} />
                     </div>
                     <div className="col-12">
-                      <label className="form-label">Immagine (URL)</label>
-                      <input className="form-control" value={form.image} onChange={e => setForm({ ...form, image: e.target.value })} />
+                      <label className="form-label">Immagini (caricamento locale)</label>
+                      <input type="file" accept="image/*" multiple className="form-control" onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        const readers = files.map(f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); }));
+                        const dataUrls = await Promise.all(readers);
+                        setForm({ ...form, images: [ ...(form.images || []), ...dataUrls ] });
+                        e.target.value = '';
+                      }} />
+                      {Array.isArray(form.images) && form.images.length > 0 && (
+                        <div className="mt-2 row g-2">
+                          {form.images.map((src, idx) => (
+                            <div key={idx} className="col-4">
+                              <div className="position-relative">
+                                <img src={src} alt={`img-${idx}`} className="img-fluid" />
+                                <button type="button" className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1" onClick={() => {
+                                  const next = [...form.images];
+                                  next.splice(idx,1);
+                                  setForm({ ...form, images: next });
+                                }}>×</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="col-12">
                       <label className="form-label">Link esterno (opzionale)</label>

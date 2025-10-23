@@ -178,7 +178,7 @@ const App = () => {
                                                     <div className="d-flex align-items-start">
                                                         <span className="fs-2 me-3">🚨</span>
                                                         <div>
-                                                            <h5>Servizio di emergenza in convenzione con ARES 118 (H24) – Postazione di Gaeta</h5>
+                                                            <h5>Servizio di emergenza in convenzione con ARES 118</h5>
                                                             <p>Operiamo 24 ore su 24 per garantire interventi tempestivi in caso di emergenza sanitaria.</p>
                                                         </div>
                                                     </div>
@@ -235,7 +235,9 @@ const App = () => {
                                                             {upcoming.map(ev => (
                                                                 <div className="col-md-4" key={ev.id}>
                                                                     <div className="card h-100">
-                                                                        {ev.image && <img src={ev.image} alt={ev.title} className="card-img-top" style={{ objectFit: 'cover', maxHeight: '160px' }} />}
+                                                                        {((Array.isArray(ev.images) && ev.images[0]) || ev.image) && (
+                                                                            <img src={(Array.isArray(ev.images) && ev.images[0]) || ev.image} alt={ev.title} className="card-img-top" style={{ objectFit: 'cover', maxHeight: '160px' }} />
+                                                                        )}
                                                                         <div className="card-body d-flex flex-column">
                                                                             <h5 className="card-title mb-1">{ev.title}</h5>
                                                                             <div className="text-muted small mb-2">{ev.date}{ev.time ? ` • ${ev.time}` : ''}</div>
