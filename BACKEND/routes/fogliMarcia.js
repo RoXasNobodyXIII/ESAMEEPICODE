@@ -3,6 +3,15 @@ const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 const { encrypt, decrypt } = require('../services/crypto');
 
+function safeDecrypt(v) {
+  try {
+    if (v == null) return v;
+    return decrypt(v);
+  } catch (_) {
+    return v;
+  }
+}
+
 async function getCurrentUser(req) {
   const db = req.app.locals.db;
   return db.collection('users').findOne({ username: req.user?.username });
@@ -35,8 +44,8 @@ router.get('/crew-options', authMiddleware, async (req, res) => {
     const items = await usersCol.find(query, { projection }).toArray();
     const out = items.map((u) => ({
       ...u,
-      nome: u.nome ? decrypt(u.nome) : u.nome,
-      cognome: u.cognome ? decrypt(u.cognome) : u.cognome,
+      nome: u.nome ? safeDecrypt(u.nome) : u.nome,
+      cognome: u.cognome ? safeDecrypt(u.cognome) : u.cognome,
     }));
     return res.json(out);
   } catch (err) {
@@ -261,7 +270,7 @@ router.get('/', authMiddleware, async (req, res) => {
     const out = items.map(it => {
       const o = { ...it };
       for (const k of encKeys) {
-        if (o[k]) o[k] = decrypt(o[k]);
+        if (o[k]) o[k] = safeDecrypt(o[k]);
       }
       return o;
     });
@@ -294,7 +303,7 @@ router.get('/:id(\\d+)', authMiddleware, async (req, res) => {
     ];
     const o = { ...doc };
     for (const k of encKeys) {
-      if (o[k]) o[k] = decrypt(o[k]);
+      if (o[k]) o[k] = safeDecrypt(o[k]);
     }
     return res.json(o);
   } catch (err) {
@@ -336,7 +345,7 @@ router.put('/:id(\\d+)', authMiddleware, async (req, res) => {
     if (!result.value) return res.status(404).json({ message: 'Non trovato' });
     const o = { ...result.value };
     for (const k of encKeys) {
-      if (o[k]) o[k] = decrypt(o[k]);
+      if (o[k]) o[k] = safeDecrypt(o[k]);
     }
     return res.json({ message: 'Aggiornato', item: o });
   } catch (err) {
