@@ -9,9 +9,6 @@ const PrivateEventEditor = () => {
   const [form, setForm] = React.useState(null);
 
   const reset = () => setForm(null);
-
-  if (!canEdit) return <div className="container mt-4"><div className="alert alert-warning">Non autorizzato.</div></div>;
-
   React.useEffect(() => {
     let mounted = true;
     (async () => {
@@ -49,6 +46,8 @@ const PrivateEventEditor = () => {
       setItems(Array.isArray(data) ? data : []);
     } catch (_) {}
   };
+
+  if (!canEdit) return <div className="container mt-4"><div className="alert alert-warning">Non autorizzato.</div></div>;
 
   return (
     <div className="container mt-4">
