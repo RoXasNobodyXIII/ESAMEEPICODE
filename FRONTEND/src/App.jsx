@@ -28,7 +28,7 @@ import RicercaFogliMarcia from './pages/RicercaFogliMarcia.jsx';
 import ReportFogliMarcia from './pages/ReportFogliMarcia.jsx';
 import Privacy from './pages/Privacy.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
-import { listEvents } from './utils/eventsStore';
+import { listEvents as fetchEvents } from './utils/eventsApi';
 
 const App = () => {
     const location = useLocation();
@@ -78,6 +78,20 @@ const App = () => {
         else if (p.startsWith('/reset-password')) title = 'RESET PASSWORD';
         document.title = title;
     }, [location.pathname]);
+
+    const [publicEvents, setPublicEvents] = React.useState([]);
+    React.useEffect(() => {
+        let mounted = true;
+        (async () => {
+            try {
+                const data = await fetchEvents(false);
+                if (mounted) setPublicEvents(Array.isArray(data) ? data : []);
+            } catch (_) {
+                if (mounted) setPublicEvents([]);
+            }
+        })();
+        return () => { mounted = false; };
+    }, []);
 
     return (
         <div className="d-flex flex-column min-vh-100">
@@ -226,8 +240,8 @@ const App = () => {
                                                         const [hh,mm] = (t || '00:00').split(':');
                                                         return new Date(`${d}T${hh.padStart(2,'0')}:${mm.padStart(2,'0')}:00`);
                                                     };
-                                                    const past = listEvents()
-                                                      .filter(e => e.status !== 'bozza' && e.date < todayKey)
+                                                    const past = publicEvents
+                                                      .filter(e => e && e.status !== 'bozza' && e.date < todayKey)
                                                       .sort((a,b) => toTime(b.date,b.time) - toTime(a.date,a.time))
                                                       .slice(0,3);
                                                     if (past.length === 0) {

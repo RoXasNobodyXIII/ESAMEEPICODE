@@ -12,6 +12,7 @@ const fogliMarciaRoutes = require('./fogliMarcia');
 const emailRoutes = require('./email');
 const uploadRoutes = require('./uploads');
 const vehiclesRoutes = require('./vehicles');
+const eventsRoutes = require('./events');
 const { requestLogger } = require('../middleware/logging');
 const { generalLimiter, authLimiter } = require('../middleware/rateLimit');
 const { connectToDB, getDB } = require('../services/db');
@@ -49,6 +50,7 @@ app.use('/fogli-marcia', fogliMarciaRoutes);
 app.use('/email', emailRoutes);
 app.use('/uploads', uploadRoutes);
 app.use('/vehicles', vehiclesRoutes);
+app.use('/events', eventsRoutes);
 
 // Start server only after DB connection
 connectToDB()

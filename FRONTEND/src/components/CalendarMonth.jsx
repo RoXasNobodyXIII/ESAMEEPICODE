@@ -1,5 +1,5 @@
 import React from 'react';
-import { listEvents } from '../utils/eventsStore';
+import { listEvents as fetchEvents } from '../utils/eventsApi';
 import { Link } from 'react-router-dom';
 
 function startOfMonth(d){ const dt=new Date(d.getFullYear(), d.getMonth(), 1); const day=dt.getDay(); return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()-((day+6)%7)); }
@@ -9,7 +9,20 @@ function fmtDateKey(d){ return d.toISOString().slice(0,10); }
 const CalendarMonth = () => {
   const [refDate, setRefDate] = React.useState(() => new Date());
   const todayKey = React.useMemo(() => new Date().toISOString().slice(0,10), []);
-  const events = React.useMemo(() => listEvents().filter(e => e.status !== 'bozza'), []);
+  const [events, setEvents] = React.useState([]);
+
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchEvents(false);
+        if (mounted) setEvents(Array.isArray(data) ? data.filter(e => e.status !== 'bozza') : []);
+      } catch (_) {
+        if (mounted) setEvents([]);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const sod = startOfMonth(refDate);
   const eom = endOfMonth(refDate);
