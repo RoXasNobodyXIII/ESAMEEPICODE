@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const authMiddleware = require('../middleware/auth');
 const roleMiddleware = require('../middleware/role');
 const { sendMail } = require('../services/email');
+const { encrypt, decrypt } = require('../services/crypto');
 const crypto = require('crypto');
 const router = express.Router();
 const APP_PUBLIC_URL = process.env.APP_PUBLIC_URL || process.env.FRONTEND_URL || '';
@@ -67,7 +68,11 @@ router.get('/me', authMiddleware, async (req, res) => {
     if (!username) return res.status(400).json({ message: 'Username mancante nel token' });
     const user = await usersCol.findOne({ username }, { projection: { _id: 0, password: 0 } });
     if (!user) return res.status(404).json({ message: 'Utente non trovato' });
-    return res.json(user);
+    const out = { ...user };
+    if (out.nome) out.nome = decrypt(out.nome);
+    if (out.cognome) out.cognome = decrypt(out.cognome);
+    if (out.cellulare) out.cellulare = decrypt(out.cellulare);
+    return res.json(out);
   } catch (e) {
     return res.status(500).json({ message: 'Errore server' });
   }
@@ -91,7 +96,13 @@ function generateRandomPassword(length = 8) {
 router.get('/', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
   try {
     const users = await getUsersCol(req).find({}, { projection: { _id: 0 } }).toArray();
-    const sanitized = users.map(({ password, ...u }) => u);
+    const sanitized = users.map(({ password, ...u }) => {
+      const out = { ...u };
+      if (out.nome) out.nome = decrypt(out.nome);
+      if (out.cognome) out.cognome = decrypt(out.cognome);
+      if (out.cellulare) out.cellulare = decrypt(out.cellulare);
+      return out;
+    });
     res.json(sanitized);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch users' });
@@ -246,9 +257,9 @@ router.post(
       password: hashedPassword,
       email,
       role,
-      nome,
-      cognome,
-      cellulare: cellulare || '',
+      nome: encrypt(nome),
+      cognome: encrypt(cognome),
+      cellulare: cellulare ? encrypt(cellulare) : '',
       qualifiche,
       stato,
       permessi,
@@ -280,7 +291,11 @@ router.post(
     }
 
     const { password, ...userWithoutPassword } = newUser;
-    return res.status(201).json({ message: 'Utente creato e notificato', user: userWithoutPassword });
+    const out = { ...userWithoutPassword };
+    if (out.nome) out.nome = decrypt(out.nome);
+    if (out.cognome) out.cognome = decrypt(out.cognome);
+    if (out.cellulare) out.cellulare = decrypt(out.cellulare);
+    return res.status(201).json({ message: 'Utente creato e notificato', user: out });
   }
 );
 
@@ -290,7 +305,11 @@ router.get('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) =
     const user = await getUsersCol(req).findOne({ id }, { projection: { _id: 0 } });
     if (!user) return res.status(404).json({ message: 'User not found' });
     const { password, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
+    const out = { ...userWithoutPassword };
+    if (out.nome) out.nome = decrypt(out.nome);
+    if (out.cognome) out.cognome = decrypt(out.cognome);
+    if (out.cellulare) out.cellulare = decrypt(out.cellulare);
+    res.json(out);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch user' });
   }
@@ -421,14 +440,34 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), userValidationRule
       }
     };
 
-    const updateDoc = { username, email, role, cellulare, qualifiche, stato, permessi };
+    const updateDoc = { username, email, role, qualifiche, stato, permessi };
+    // Handle optional PII updates with encryption
+    if (typeof req.body.cellulare === 'string') {
+      updateDoc.cellulare = encrypt(req.body.cellulare.trim());
+    } else if (existing.cellulare) {
+      updateDoc.cellulare = existing.cellulare;
+    }
+    if (typeof req.body.nome === 'string') {
+      updateDoc.nome = encrypt(req.body.nome);
+    } else if (existing.nome) {
+      updateDoc.nome = existing.nome;
+    }
+    if (typeof req.body.cognome === 'string') {
+      updateDoc.cognome = encrypt(req.body.cognome);
+    } else if (existing.cognome) {
+      updateDoc.cognome = existing.cognome;
+    }
     if (password) {
       updateDoc.password = await bcrypt.hash(password, 10);
     }
 
     await usersCol.updateOne({ id }, { $set: updateDoc });
     const updated = await usersCol.findOne({ id }, { projection: { _id: 0, password: 0 } });
-    res.json(updated);
+    const out = { ...updated };
+    if (out.nome) out.nome = decrypt(out.nome);
+    if (out.cognome) out.cognome = decrypt(out.cognome);
+    if (out.cellulare) out.cellulare = decrypt(out.cellulare);
+    res.json(out);
   } catch (err) {
     res.status(500).json({ message: 'Failed to update user' });
   }

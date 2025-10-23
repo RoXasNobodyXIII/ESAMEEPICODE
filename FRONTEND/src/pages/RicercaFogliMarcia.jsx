@@ -157,7 +157,7 @@ const RicercaFogliMarcia = () => {
                               <td style={{whiteSpace:'nowrap'}}>{f.serviceCode || `#${f.id}`}</td>
                               <td>{f.indirizzo || '-'}</td>
                               <td>{onlyTime(f.uscita)}</td>
-                              <td>{f.fine || '-'}</td>
+                              <td>{onlyTime(f.fine)}</td>
                               <td>{f.esito || '-'}</td>
                             </tr>
                           ))}
@@ -175,7 +175,7 @@ const RicercaFogliMarcia = () => {
                           <div className="small text-muted">{f.indirizzo || '-'}</div>
                           <div className="mt-1">
                             <span className="badge bg-light text-dark me-1">Partenza: {onlyTime(f.uscita)}</span>
-                            <span className="badge bg-light text-dark me-1">Fine: {f.fine || '-'}</span>
+                            <span className="badge bg-light text-dark me-1">Fine: {onlyTime(f.fine)}</span>
                             <span className="badge bg-secondary">{f.esito || '-'}</span>
                           </div>
                         </div>

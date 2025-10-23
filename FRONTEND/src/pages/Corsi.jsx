@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import CorsiCalendar from '../components/CorsiCalendar.jsx';
 
 const Corsi = () => {
   const [showInfo, setShowInfo] = useState(true);
@@ -9,24 +10,31 @@ const Corsi = () => {
 
   return (
     <div className="container mt-5 position-relative">
-      <h2>I NOSTRI CORSI</h2>
-      <p className="text-muted">Informazioni sui corsi: PBLSD, PTC, corso soccorritore e formazione per la comunità.</p>
+      <h2 className="mb-1">I NOSTRI CORSI</h2>
+      <p className="text-muted mb-4">Informazioni sui corsi: PBLSD, PTC, corso soccorritore e formazione per la comunità.</p>
 
-      <div className="corsi-layout">
-        <div className="corsi-image-wrap">
-          <img
-            src="https://res.cloudinary.com/dkbahjqa6/image/upload/v1761085531/IMG-20251020-WA0034_wlnm0w.jpg"
-            alt="Corsi - immagine"
-            className="corsi-image"
-            loading="lazy"
-          />
+      <div className="row g-4 align-items-start">
+        <div className="col-lg-6">
+          <CorsiCalendar />
         </div>
-        <div className="corsi-text">
-          <h3>Corsi di educazione sanitaria e di Primo Soccorso</h3>
-          <p>
-            Organizziamo corsi di formazione e aggiornamento in collaborazione con <strong>CSE FORMAZIONE</strong> rivolti sia al personale sanitario che alla popolazione,
-            con l’obiettivo di diffondere la cultura della prevenzione, del primo soccorso e della sicurezza, migliorando la capacità di intervento e di aiuto reciproco in ogni situazione di emergenza.
-          </p>
+        <div className="col-lg-6">
+          <div className="card shadow-sm h-100">
+            <div className="card-body">
+              <div className="mb-3">
+                <img
+                  src="https://res.cloudinary.com/dkbahjqa6/image/upload/v1761085531/IMG-20251020-WA0034_wlnm0w.jpg"
+                  alt="Corsi - immagine"
+                  className="img-fluid rounded"
+                  loading="lazy"
+                />
+              </div>
+              <h3 className="h4">Corsi di educazione sanitaria e di Primo Soccorso</h3>
+              <p className="mb-0">
+                Organizziamo corsi di formazione e aggiornamento in collaborazione con <strong>CSE FORMAZIONE</strong> rivolti sia al personale sanitario che alla popolazione,
+                con l’obiettivo di diffondere la cultura della prevenzione, del primo soccorso e della sicurezza, migliorando la capacità di intervento e di aiuto reciproco in ogni situazione di emergenza.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

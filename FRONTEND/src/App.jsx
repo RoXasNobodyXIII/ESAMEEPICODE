@@ -214,25 +214,28 @@ const App = () => {
                                         </div>
 
                                         <div className="mt-5">
-                                            <h2>Prossimi Eventi</h2>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <h2 className="mb-0">Attività passate</h2>
+                                                <Link className="btn btn-outline-primary btn-sm" to="/news">Prossimi eventi →</Link>
+                                            </div>
                                             {
                                                 (() => {
-                                                    const today = new Date();
-                                                    const todayKey = today.toISOString().slice(0,10);
+                                                    const now = new Date();
+                                                    const todayKey = now.toISOString().slice(0,10);
                                                     const toTime = (d, t) => {
                                                         const [hh,mm] = (t || '00:00').split(':');
                                                         return new Date(`${d}T${hh.padStart(2,'0')}:${mm.padStart(2,'0')}:00`);
                                                     };
-                                                    const upcoming = listEvents()
-                                                      .filter(e => e.status !== 'bozza' && e.date >= todayKey)
-                                                      .sort((a,b) => toTime(a.date,a.time) - toTime(b.date,b.time))
+                                                    const past = listEvents()
+                                                      .filter(e => e.status !== 'bozza' && e.date < todayKey)
+                                                      .sort((a,b) => toTime(b.date,b.time) - toTime(a.date,a.time))
                                                       .slice(0,3);
-                                                    if (upcoming.length === 0) {
-                                                        return <div className="text-muted">Nessun evento imminente. Consulta il <Link to="/news">calendario</Link>.</div>
+                                                    if (past.length === 0) {
+                                                        return <div className="text-muted">Ancora nessuna attività passata registrata.</div>
                                                     }
                                                     return (
                                                         <div className="row">
-                                                            {upcoming.map(ev => (
+                                                            {past.map(ev => (
                                                                 <div className="col-md-4" key={ev.id}>
                                                                     <div className="card h-100">
                                                                         {((Array.isArray(ev.images) && ev.images[0]) || ev.image) && (
@@ -242,7 +245,7 @@ const App = () => {
                                                                             <h5 className="card-title mb-1">{ev.title}</h5>
                                                                             <div className="text-muted small mb-2">{ev.date}{ev.time ? ` • ${ev.time}` : ''}</div>
                                                                             {ev.description && <p className="card-text flex-grow-1">{ev.description.length>120? ev.description.slice(0,120)+'…' : ev.description}</p>}
-                                                                            <Link className="btn btn-primary mt-auto" to={`/eventi/${ev.id}`}>Dettagli</Link>
+                                                                            <Link className="btn btn-outline-secondary mt-auto" to={`/eventi/${ev.id}`}>Dettagli</Link>
                                                                         </div>
                                                                     </div>
                                                                 </div>

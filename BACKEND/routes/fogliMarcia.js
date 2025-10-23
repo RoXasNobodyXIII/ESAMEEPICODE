@@ -9,7 +9,6 @@ async function getCurrentUser(req) {
 }
 
 
-// Crew options for assignment
 router.get('/crew-options', authMiddleware, async (req, res) => {
   try {
     const user = await getCurrentUser(req);
@@ -34,7 +33,12 @@ router.get('/crew-options', authMiddleware, async (req, res) => {
 
     const projection = { _id: 0, username: 1, nome: 1, cognome: 1, qualifiche: 1 };
     const items = await usersCol.find(query, { projection }).toArray();
-    return res.json(items);
+    const out = items.map((u) => ({
+      ...u,
+      nome: u.nome ? decrypt(u.nome) : u.nome,
+      cognome: u.cognome ? decrypt(u.cognome) : u.cognome,
+    }));
+    return res.json(out);
   } catch (err) {
     console.error('Errore crew-options:', err);
     return res.status(500).json({ message: 'Errore server' });
@@ -145,7 +149,11 @@ router.post('/', authMiddleware, async (req, res) => {
       payload.kmIniziali = await getCurrentOdo(mezzo);
     }
 
-    const encKeys = ['note','destinazione','indirizzo','cognome','nome'];
+    const encKeys = [
+      'note','destinazione','indirizzo','cognome','nome',
+      'comune','richiestoDa','motivoServizio','sesso','annoNascita','postazione','missione118','esito',
+      'uscita','sulPosto','arrivoDestinazione','fine'
+    ];
     for (const k of encKeys) {
       if (payload[k] != null && String(payload[k]).trim() !== '') payload[k] = encrypt(payload[k]);
     }
@@ -245,7 +253,11 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 
     const items = await col.find(q).sort({ createdAt: -1 }).limit(200).toArray();
-    const encKeys = ['note','destinazione','indirizzo','cognome','nome'];
+    const encKeys = [
+      'note','destinazione','indirizzo','cognome','nome',
+      'comune','richiestoDa','motivoServizio','sesso','annoNascita','postazione','missione118','esito',
+      'uscita','sulPosto','arrivoDestinazione','fine'
+    ];
     const out = items.map(it => {
       const o = { ...it };
       for (const k of encKeys) {
@@ -275,7 +287,11 @@ router.get('/:id(\\d+)', authMiddleware, async (req, res) => {
     if (!Number.isFinite(id)) return res.status(400).json({ message: 'ID non valido' });
     const doc = await col.findOne({ id });
     if (!doc) return res.status(404).json({ message: 'Non trovato' });
-    const encKeys = ['note','destinazione','indirizzo','cognome','nome'];
+    const encKeys = [
+      'note','destinazione','indirizzo','cognome','nome',
+      'comune','richiestoDa','motivoServizio','sesso','annoNascita','postazione','missione118','esito',
+      'uscita','sulPosto','arrivoDestinazione','fine'
+    ];
     const o = { ...doc };
     for (const k of encKeys) {
       if (o[k]) o[k] = decrypt(o[k]);
@@ -297,10 +313,20 @@ router.put('/:id(\\d+)', authMiddleware, async (req, res) => {
     const col = db.collection(COLLECTION);
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ message: 'ID non valido' });
-    const allowed = ['indirizzo','uscita','sulPosto','arrivoDestinazione','fine','esito','destinazione','note','autista','soccorritore1','soccorritore2','infermiere','medico','kmFinali','cognome','nome'];
+    const allowed = [
+      'indirizzo','uscita','sulPosto','arrivoDestinazione','fine','esito','destinazione','note',
+      'autista','soccorritore1','soccorritore2','infermiere','medico','kmFinali','cognome','nome',
+      // extra fields from creation
+      'tipologiaServizio','data','richiestoDa','motivoServizio','sesso','annoNascita','comune',
+      'mezzo','kmIniziali','postazione','missione118'
+    ];
     const update = {};
     for (const k of allowed) if (k in req.body) update[k] = req.body[k];
-    const encKeys = ['note','destinazione','indirizzo','cognome','nome'];
+    const encKeys = [
+      'note','destinazione','indirizzo','cognome','nome',
+      'comune','richiestoDa','motivoServizio','sesso','annoNascita','postazione','missione118','esito',
+      'uscita','sulPosto','arrivoDestinazione','fine'
+    ];
     for (const k of encKeys) {
       if (k in update && update[k] != null && String(update[k]).trim() !== '') update[k] = encrypt(update[k]);
     }

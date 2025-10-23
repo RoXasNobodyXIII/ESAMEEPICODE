@@ -43,7 +43,6 @@ const Personale = () => {
   const [permessi, setPermessi] = useState({
     soccorsi: { inserire: false, elenco: false, ricerca: false, report: false },
     fogliMarcia: { inserire: false, elenco: false, ricerca: false, modifica: false, altro: false, tutto: false },
-    ferie: { nuovaRichiesta: false },
     amministrazione: { utenti: false, mezzi: false },
     sito: { gestione: false },
     calendar: { view: false }
@@ -94,9 +93,9 @@ const Personale = () => {
       setPermessi({
         soccorsi: { inserire: false, elenco: false, ricerca: false, report: false },
         fogliMarcia: { inserire: false, elenco: false, ricerca: false, modifica: false, altro: false, tutto: false },
-        ferie: { nuovaRichiesta: false },
         amministrazione: { utenti: false, mezzi: false },
-        sito: { gestione: false }
+        sito: { gestione: false },
+        calendar: { view: false }
       });
       setAssociate(false);
       
@@ -305,7 +304,6 @@ const Personale = () => {
                         setPermessi({
                           soccorsi: { inserire: true, elenco: true, ricerca: true, report: true },
                           fogliMarcia: { inserire: true, elenco: true, ricerca: true, modifica: true, altro: true, tutto: true },
-                          ferie: { nuovaRichiesta: true },
                           amministrazione: { utenti: true, mezzi: true },
                           sito: { gestione: true },
                           calendar: { view: true }
@@ -338,24 +336,7 @@ const Personale = () => {
 
                       
 
-                      <div className="col-12 mt-3">
-                        <div className="mb-1 fw-semibold">Ferie</div>
-                        <div className="row g-3 align-items-center">
-                          {[
-                            ['nuovaRichiesta','➕','Nuova Richiesta']
-                          ].map(([k,icon,label]) => (
-                            <div className="col-auto" key={`ferie-${k}`}>
-                              <div className="form-check d-flex align-items-center gap-2">
-                                <input id={`pm-ferie-${k}`} className="form-check-input" type="checkbox" checked={!!permessi.ferie?.[k]} onChange={(e) => setPermessi({ ...permessi, ferie: { ...permessi.ferie, [k]: e.target.checked } })} />
-                                <label className="form-check-label d-flex align-items-center gap-1" htmlFor={`pm-ferie-${k}`}>
-                                  <span aria-hidden="true">{icon}</span>
-                                  <span>{label}</span>
-                                </label>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                      
 
                       <div className="col-12 mt-3">
                         <div className="mb-1 fw-semibold">Amministrazione</div>
@@ -430,21 +411,7 @@ const Personale = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="mb-2 fw-semibold">Stato</div>
-                        <div className="row g-2">
-                          <div className="col-auto">
-                            <div className="form-check">
-                              <input id="assoc-inline-st-vol" className="form-check-input" type="checkbox" checked={stato.volontario} onChange={(e) => setStato({ ...stato, volontario: e.target.checked })} />
-                              <label htmlFor="assoc-inline-st-vol" className="form-check-label">Volontario</label>
-                            </div>
-                          </div>
-                          <div className="col-auto">
-                            <div className="form-check">
-                              <input id="assoc-inline-st-att" className="form-check-input" type="checkbox" checked={stato.attivo} onChange={(e) => setStato({ ...stato, attivo: e.target.checked })} />
-                              <label htmlFor="assoc-inline-st-att" className="form-check-label">Attivo</label>
-                            </div>
-                          </div>
-                        </div>
+                        
                       </div>
                     )}
                   </div>
@@ -616,29 +583,7 @@ const Personale = () => {
                       </div>
                     </div>
 
-                    <div className="col-12 mt-3">
-                      <div className="mb-1 fw-semibold">Fogli Marcia - Avanzati</div>
-                      <div className="row g-3 align-items-center">
-                        {[
-                          ['inserire','➕','Inserire'],
-                          ['elenco','📋','Elenco'],
-                          ['ricerca','🔎','Ricerca'],
-                          ['modifica','✎','Modifica'],
-                          ['altro','⋯','Altro'],
-                          ['tutto','✓','Tutto']
-                        ].map(([k,icon,label]) => (
-                          <div className="col-auto" key={`edit-fm-${k}`}>
-                            <div className="form-check d-flex align-items-center gap-2">
-                              <input id={`edit-pm-fm-${k}`} className="form-check-input" type="checkbox" checked={!!editData.permessi?.fogliMarcia?.[k]} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, fogliMarcia: { ...(editData.permessi?.fogliMarcia||{}), [k]: e.target.checked } } })} />
-                              <label className="form-check-label d-flex align-items-center gap-1" htmlFor={`edit-pm-fm-${k}`}>
-                                <span aria-hidden="true">{icon}</span>
-                                <span>{label}</span>
-                              </label>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    
 
                     <div className="col-12 mt-3">
                       <div className="mb-1 fw-semibold">Amministrazione</div>
@@ -659,6 +604,30 @@ const Personale = () => {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+
+                    <div className="col-12 mt-3">
+                      <div className="mb-1 fw-semibold">Sito</div>
+                      <div className="row g-3 align-items-center">
+                        <div className="col-auto">
+                          <div className="form-check d-flex align-items-center gap-2">
+                            <input id="edit-pm-sito-gestione" className="form-check-input" type="checkbox" checked={!!editData.permessi?.sito?.gestione} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, sito: { gestione: e.target.checked } } })} />
+                            <label className="form-check-label" htmlFor="edit-pm-sito-gestione">Gestione sito</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-12 mt-3">
+                      <div className="mb-1 fw-semibold">Calendario</div>
+                      <div className="row g-3 align-items-center">
+                        <div className="col-auto">
+                          <div className="form-check d-flex align-items-center gap-2">
+                            <input id="edit-pm-cal-view" className="form-check-input" type="checkbox" checked={!!editData.permessi?.calendar?.view} onChange={(e) => setEditData({ ...editData, permessi: { ...editData.permessi, calendar: { view: e.target.checked } } })} />
+                            <label className="form-check-label" htmlFor="edit-pm-cal-view">Solo visualizzazione calendario</label>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

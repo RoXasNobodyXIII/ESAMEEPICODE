@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 
@@ -110,7 +111,7 @@ const AdminMezzi = () => {
           </div>
         </div>
       </div>
-      {showModal && (
+      {showModal && createPortal(
         <div className="modal d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,.5)', position: 'fixed', inset: 0, zIndex: 2000 }}>
           <div className="modal-dialog" role="document">
             <div className="modal-content">
@@ -140,7 +141,7 @@ const AdminMezzi = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>, document.body
       )}
     </div>
   );

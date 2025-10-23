@@ -15,6 +15,18 @@ const FogliMarcia = () => {
   const [vehicles, setVehicles] = useState([]);
   const [vehLoading, setVehLoading] = useState(false);
 
+  const onlyTime = (v) => {
+    if (!v) return '-';
+    try {
+      const dt = new Date(v);
+      if (!Number.isNaN(dt.getTime())) {
+        return dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+      }
+    } catch (_) {}
+    const m = String(v).match(/T(\d{2}:\d{2})/);
+    return m ? m[1] : String(v);
+  };
+
   // Carica elenco mezzo
   useEffect(() => {
     setError('');
@@ -94,6 +106,20 @@ const FogliMarcia = () => {
         infermiere: editItem.infermiere,
         medico: editItem.medico,
         kmFinali: editItem.kmFinali,
+        cognome: editItem.cognome,
+        nome: editItem.nome,
+        // extra fields from creation
+        tipologiaServizio: editItem.tipologiaServizio,
+        data: editItem.data,
+        richiestoDa: editItem.richiestoDa,
+        motivoServizio: editItem.motivoServizio,
+        sesso: editItem.sesso,
+        annoNascita: editItem.annoNascita,
+        comune: editItem.comune,
+        mezzo: editItem.mezzo,
+        kmIniziali: editItem.kmIniziali,
+        postazione: editItem.postazione,
+        missione118: editItem.missione118,
       };
       await api.put(`/fogli-marcia/${editItem.id}`, payload);
       // refresh list
@@ -158,7 +184,6 @@ const FogliMarcia = () => {
                           <tr>
                             <th style={{whiteSpace:'nowrap'}}>#</th>
                             <th>Cognome</th>
-                            <th>Tipo di servizi</th>
                             <th>Motivo del servizio</th>
                             <th>Partenza</th>
                             <th>Fine</th>
@@ -171,10 +196,9 @@ const FogliMarcia = () => {
                             <tr key={f._id || f.id}>
                               <td style={{whiteSpace:'nowrap'}}>{f.serviceCode || `#${f.id}`}</td>
                               <td>{f.cognome || '-'}</td>
-                              <td>{f.tipoServizi || '-'}</td>
                               <td>{f.motivoServizio || '-'}</td>
-                              <td>{f.uscita || '-'}</td>
-                              <td>{f.fine || '-'}</td>
+                              <td>{onlyTime(f.uscita)}</td>
+                              <td>{onlyTime(f.fine)}</td>
                               <td>{f.esito || '-'}</td>
                               <td>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -201,10 +225,9 @@ const FogliMarcia = () => {
                           </div>
                           <div className="small text-muted">{f.cognome || '-'}</div>
                           <div className="mt-1">
-                            <span className="badge bg-light text-dark me-1">Tipo: {f.tipoServizi || '-'}</span>
                             <span className="badge bg-light text-dark me-1">Motivo: {f.motivoServizio || '-'}</span>
-                            <span className="badge bg-light text-dark me-1">Partenza: {f.uscita || '-'}</span>
-                            <span className="badge bg-light text-dark me-1">Fine: {f.fine || '-'}</span>
+                            <span className="badge bg-light text-dark me-1">Partenza: {onlyTime(f.uscita)}</span>
+                            <span className="badge bg-light text-dark me-1">Fine: {onlyTime(f.fine)}</span>
                             <span className="badge bg-secondary">{f.esito || '-'}</span>
                           </div>
                         </div>
@@ -229,8 +252,65 @@ const FogliMarcia = () => {
               <div className="modal-body">
                 <div className="row g-3">
                   <div className="col-md-6">
+                    <label className="form-label">Tipologia servizio</label>
+                    <input className="form-control" value={editItem.tipologiaServizio || ''} onChange={(e) => onEditField('tipologiaServizio', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Data</label>
+                    <input type="date" className="form-control" value={editItem.data || ''} onChange={(e) => onEditField('data', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Richiesto da</label>
+                    <select className="form-select" value={editItem.richiestoDa || ''} onChange={(e) => onEditField('richiestoDa', e.target.value)}>
+                      <option value="">- SELEZIONA -</option>
+                      <option>Familiari</option>
+                      <option>Servizi sociali</option>
+                      <option>Altro</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Motivo del servizio</label>
+                    <select className="form-select" value={editItem.motivoServizio || ''} onChange={(e) => onEditField('motivoServizio', e.target.value)}>
+                      <option value="">- SELEZIONA -</option>
+                      <option>Visita</option>
+                      <option>Trasferimento</option>
+                      <option>Ricovero o Dimissione</option>
+                      <option>Presidio</option>
+                      <option>Assist. o Manuten.</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Cognome</label>
+                    <input className="form-control" value={editItem.cognome || ''} onChange={(e) => onEditField('cognome', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Nome</label>
+                    <input className="form-control" value={editItem.nome || ''} onChange={(e) => onEditField('nome', e.target.value)} />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Sesso</label>
+                    <select className="form-select" value={editItem.sesso || ''} onChange={(e) => onEditField('sesso', e.target.value)}>
+                      <option value="">- SELEZIONA -</option>
+                      <option>M</option>
+                      <option>F</option>
+                      <option>NR</option>
+                    </select>
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Anno di nascita</label>
+                    <input type="number" className="form-control" value={editItem.annoNascita || ''} onChange={(e) => onEditField('annoNascita', e.target.value)} />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Comune</label>
+                    <input className="form-control" value={editItem.comune || ''} onChange={(e) => onEditField('comune', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
                     <label className="form-label">Indirizzo</label>
                     <input className="form-control" value={editItem.indirizzo || ''} onChange={(e) => onEditField('indirizzo', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Postazione</label>
+                    <input className="form-control" value={editItem.postazione || ''} onChange={(e) => onEditField('postazione', e.target.value)} />
                   </div>
                   <div className="col-md-3">
                     <label className="form-label">Partenza</label>
@@ -239,6 +319,14 @@ const FogliMarcia = () => {
                   <div className="col-md-3">
                     <label className="form-label">Fine</label>
                     <input type="time" className="form-control" value={editItem.fine || ''} onChange={(e) => onEditField('fine', e.target.value)} />
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-label">Sul posto</label>
+                    <input type="time" className="form-control" value={editItem.sulPosto || ''} onChange={(e) => onEditField('sulPosto', e.target.value)} />
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-label">Arrivo destinazione</label>
+                    <input type="time" className="form-control" value={editItem.arrivoDestinazione || ''} onChange={(e) => onEditField('arrivoDestinazione', e.target.value)} />
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Esito</label>
@@ -253,6 +341,42 @@ const FogliMarcia = () => {
                   <div className="col-md-6">
                     <label className="form-label">Destinazione</label>
                     <input className="form-control" value={editItem.destinazione || ''} onChange={(e) => onEditField('destinazione', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Missione 118</label>
+                    <input className="form-control" value={editItem.missione118 || ''} onChange={(e) => onEditField('missione118', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Mezzo</label>
+                    <input className="form-control" value={editItem.mezzo || ''} onChange={(e) => onEditField('mezzo', e.target.value)} />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Autista</label>
+                    <input className="form-control" value={editItem.autista || ''} onChange={(e) => onEditField('autista', e.target.value)} />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Soccorritore 1</label>
+                    <input className="form-control" value={editItem.soccorritore1 || ''} onChange={(e) => onEditField('soccorritore1', e.target.value)} />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Soccorritore 2</label>
+                    <input className="form-control" value={editItem.soccorritore2 || ''} onChange={(e) => onEditField('soccorritore2', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Infermiere</label>
+                    <input className="form-control" value={editItem.infermiere || ''} onChange={(e) => onEditField('infermiere', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Medico</label>
+                    <input className="form-control" value={editItem.medico || ''} onChange={(e) => onEditField('medico', e.target.value)} />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Km iniziali</label>
+                    <input type="number" className="form-control" value={editItem.kmIniziali || ''} onChange={(e) => onEditField('kmIniziali', e.target.value)} />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">Km finali</label>
+                    <input type="number" className="form-control" value={editItem.kmFinali || ''} onChange={(e) => onEditField('kmFinali', e.target.value)} />
                   </div>
                   <div className="col-12">
                     <label className="form-label">Note</label>
