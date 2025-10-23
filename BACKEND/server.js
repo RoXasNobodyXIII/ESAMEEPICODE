@@ -44,6 +44,14 @@ app.use('/vehicles', vehiclesRoutes);
 app.use('/uploads', uploadsRoutes);
 app.use('/events', eventsRoutes);
 
+// Basic root and health endpoints (useful for Render health checks)
+app.get('/', (req, res) => {
+  res.status(200).json({ ok: true, name: 'Croce d\'Oro API', version: process.env.RENDER_GIT_COMMIT || 'local' });
+});
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Start server only after DB connection
 connectToDB()
   .then(async () => {
