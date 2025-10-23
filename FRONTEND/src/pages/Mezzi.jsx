@@ -2,26 +2,31 @@ import React, { useEffect } from 'react';
 
 const Mezzi = () => {
   useEffect(() => {
-    document.title = "Mezzi";
+    document.title = "MEZZI";
   }, []);
 
   return (
-    <div className="container mt-5">
-      <h2> I Nostri Mezzi</h2>
+    <>
+      <section className="mezzi-hero-full">
+        <span className="visually-hidden" role="img" aria-label="Parco mezzi della Croce d'Oro Sud Pontino"></span>
+      </section>
 
-      <div className="card mt-3">
-        <div className="card-body">
-          <p className="mb-3">
-            La nostra Associazione dispone di un parco macchine composto da:
-          </p>
-          <ul className="mb-0">
-            <li>N. 3 Autoambulanze</li>
-            <li>2 Boxer Peugeot</li>
-            <li>1 Fiat Ducato</li>
-          </ul>
+      <div className="container mt-5">
+        <h2 className="mb-3">I NOSTRI MEZZI</h2>
+        <div className="card">
+          <div className="card-body">
+            <p className="mb-3">
+              La nostra Associazione dispone di:
+            </p>
+            <ul className="mb-0">
+              <h5 className="list-title">-3 Ambulanze</h5>
+              <li>2 Peugeot Boxer</li>
+              <li>1 Fiat Ducato</li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -157,7 +157,9 @@ const FogliMarcia = () => {
                         <thead>
                           <tr>
                             <th style={{whiteSpace:'nowrap'}}>#</th>
-                            <th>Indirizzo</th>
+                            <th>Cognome</th>
+                            <th>Tipo di servizi</th>
+                            <th>Motivo del servizio</th>
                             <th>Partenza</th>
                             <th>Fine</th>
                             <th>Esito</th>
@@ -168,7 +170,9 @@ const FogliMarcia = () => {
                           {arr.map((f) => (
                             <tr key={f._id || f.id}>
                               <td style={{whiteSpace:'nowrap'}}>{f.serviceCode || `#${f.id}`}</td>
-                              <td>{f.indirizzo || '-'}</td>
+                              <td>{f.cognome || '-'}</td>
+                              <td>{f.tipoServizi || '-'}</td>
+                              <td>{f.motivoServizio || '-'}</td>
                               <td>{f.uscita || '-'}</td>
                               <td>{f.fine || '-'}</td>
                               <td>{f.esito || '-'}</td>
@@ -195,8 +199,10 @@ const FogliMarcia = () => {
                               <button className="btn btn-outline-danger" onClick={() => delItem(f)}>Elimina</button>
                             </div>
                           </div>
-                          <div className="small text-muted">{f.indirizzo || '-'}</div>
+                          <div className="small text-muted">{f.cognome || '-'}</div>
                           <div className="mt-1">
+                            <span className="badge bg-light text-dark me-1">Tipo: {f.tipoServizi || '-'}</span>
+                            <span className="badge bg-light text-dark me-1">Motivo: {f.motivoServizio || '-'}</span>
                             <span className="badge bg-light text-dark me-1">Partenza: {f.uscita || '-'}</span>
                             <span className="badge bg-light text-dark me-1">Fine: {f.fine || '-'}</span>
                             <span className="badge bg-secondary">{f.esito || '-'}</span>

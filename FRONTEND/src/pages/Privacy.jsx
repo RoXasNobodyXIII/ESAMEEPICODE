@@ -2,12 +2,12 @@ import React from 'react';
 
 const Privacy = () => {
   React.useEffect(() => {
-    document.title = "Privacy";
+    document.title = "PRIVACY";
   }, []);
 
   return (
     <div className="container mt-5">
-      <h1>Privacy Policy</h1>
+      <h1>PRIVACY POLICY</h1>
       <p>
         CROCE D'ORO SUD PONTINO ONLUS – Organizzazione di Volontariato di primo soccorso e assistenza sanitaria –
         (di seguito anche "Titolare del trattamento"), come previsto dal Regolamento dell’Unione Europea n. 679/2016

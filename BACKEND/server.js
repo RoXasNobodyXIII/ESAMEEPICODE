@@ -13,6 +13,8 @@ const peopleRoutes = require('./routes/people');
 const fogliMarciaRoutes = require('./routes/fogliMarcia');
 const emailRoutes = require('./routes/email');
 const vehiclesRoutes = require('./routes/vehicles');
+const uploadsRoutes = require('./routes/uploads');
+const eventsRoutes = require('./routes/events');
 const { requestLogger } = require('./middleware/logging');
 const { generalLimiter, authLimiter } = require('./middleware/rateLimit');
 const securityHeaders = require('./middleware/sanitization');
@@ -39,6 +41,8 @@ app.use('/people', peopleRoutes);
 app.use('/fogli-marcia', fogliMarciaRoutes);
 app.use('/email', emailRoutes);
 app.use('/vehicles', vehiclesRoutes);
+app.use('/uploads', uploadsRoutes);
+app.use('/events', eventsRoutes);
 
 // Start server only after DB connection
 connectToDB()

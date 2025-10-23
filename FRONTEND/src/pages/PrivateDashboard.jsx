@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { clearTokens, getUserRole } from '../auth';
+import api from '../api';
 
 const NavItem = ({ to, label }) => {
   const location = useLocation();
@@ -16,6 +17,7 @@ const NavItem = ({ to, label }) => {
 
 const PrivateDashboard = () => {
   const role = getUserRole();
+  const [canGestioneSito, setCanGestioneSito] = React.useState(false);
   const location = useLocation();
   const isUtenti = location.pathname.startsWith('/private/tools/amministrazione/utenti');
 
@@ -33,9 +35,23 @@ const PrivateDashboard = () => {
   const isAdmin = role === 'admin';
   const showTools = isAdmin;
 
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data } = await api.get('/users/me');
+        const allowed = data?.role === 'admin' || data?.permessi?.sito?.gestione === true;
+        if (mounted) setCanGestioneSito(!!allowed);
+      } catch (_) {
+        if (mounted) setCanGestioneSito(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
 
   return (
-    <div className={isUtenti ? "container-fluid mt-4" : "container mt-4"}>
+    <div className={(isUtenti ? "container-fluid" : "container") + " mt-4 private-area"}>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Area Riservata {role ? `- ${role}` : ''}</h2>
       </div>
@@ -55,6 +71,31 @@ const PrivateDashboard = () => {
           </ul>
         </li>
         <NavItem to="/private/magazzino" label="Magazzino" />
+        {canGestioneSito && (
+          <li className="nav-item dropdown me-2 mb-2">
+            <button
+              className={`btn btn-sm dropdown-toggle ${
+                location.pathname.startsWith('/private/attivita/crea') || location.pathname.startsWith('/private/tools/eventi')
+                  ? 'btn-primary'
+                  : 'btn-outline-primary'
+              }`}
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Eventi
+            </button>
+            <ul className="dropdown-menu">
+              <li>
+                <Link className="dropdown-item" to="/private/attivita/crea">Crea evento</Link>
+              </li>
+              {isAdmin && (
+                <li>
+                  <Link className="dropdown-item" to="/private/tools/eventi">Gestione eventi</Link>
+                </li>
+              )}
+            </ul>
+          </li>
+        )}
         
         <li className="nav-item dropdown me-2 mb-2">
           <button

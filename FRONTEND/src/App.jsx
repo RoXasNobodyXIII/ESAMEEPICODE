@@ -15,24 +15,30 @@ import MezzoGestione from './pages/MezzoGestione.jsx';
 import Mezzi from './pages/Mezzi.jsx';
 import CinquePerMille from './pages/CinquePerMille.jsx';
 import StrutturaOrganizzativa from './pages/StrutturaOrganizzativa.jsx';
+import Storia from './pages/Storia.jsx';
 import Corsi from './pages/Corsi.jsx';
 import DiventareVolontario from './pages/DiventareVolontario.jsx';
 import RichiedereServizio from './pages/RichiedereServizio.jsx';
-import ChiSiamo from './pages/ChiSiamo.jsx';
 import News from './pages/News.jsx';
+import EventDetail from './pages/EventDetail.jsx';
+import PrivateEventEditor from './pages/PrivateEventEditor.jsx';
+import CreazionePostAttivita from './pages/CreazionePostAttivita.jsx';
 import Galleria from './pages/Galleria.jsx';
 import RicercaFogliMarcia from './pages/RicercaFogliMarcia.jsx';
 import ReportFogliMarcia from './pages/ReportFogliMarcia.jsx';
 import Privacy from './pages/Privacy.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
+import { listEvents } from './utils/eventsStore';
 
 const App = () => {
     const location = useLocation();
     const isPrivate = location.pathname.startsWith('/private');
     const isLogin = location.pathname.startsWith('/login');
     const onLogout = () => {
-        clearTokens();
-        window.location.href = '/login';
+        if (window.confirm('Sei sicuro di voler effettuare il logout?')) {
+            clearTokens();
+            window.location.href = '/login';
+        }
     };
 
     React.useEffect(() => {
@@ -54,19 +60,38 @@ const App = () => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, [location.pathname]);
 
+    // Global title updater to avoid stale titles across navigation
+    React.useEffect(() => {
+        const p = location.pathname;
+        let title = "Croce d'Oro Sud Pontino";
+        if (p === '/') title = "Home - Croce d'Oro Sud Pontino";
+        else if (p.startsWith('/news') || p.startsWith('/eventi')) title = 'EVENTI';
+        else if (p.startsWith('/galleria')) title = 'GALLERIA';
+        else if (p.startsWith('/mezzi')) title = 'MEZZI';
+        else if (p.startsWith('/5x1000')) title = '5 x mille';
+        else if (p.startsWith('/struttura-organizzativa')) title = 'ASSOCIAZIONE';
+        else if (p.startsWith('/storia')) title = 'STORIA';
+        else if (p.startsWith('/corsi')) title = 'CORSI';
+        else if (p.startsWith('/diventare-volontario')) title = 'DIVENTARE VOLONTARIO';
+        else if (p.startsWith('/richiedere-servizio')) title = 'RICHIEDERE SERVIZIO';
+        else if (p.startsWith('/privacy')) title = 'PRIVACY';
+        else if (p.startsWith('/reset-password')) title = 'RESET PASSWORD';
+        document.title = title;
+    }, [location.pathname]);
+
     return (
         <div className="d-flex flex-column min-vh-100">
             <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
                 <div className="container-fluid">
                     {isPrivate ? (
-                        <Link className="navbar-brand d-flex align-items-center" to="/private">
+                        <span className="navbar-brand d-flex align-items-center" role="img" aria-label="Croce d'Oro Sud Pontino - Area Privata">
                             <img
                                 src="https://res.cloudinary.com/dkbahjqa6/image/upload/v1760208659/LOGO_CROCE_yzhmab.jpg"
                                 alt="Croce d'Oro Sud Pontino logo"
                                 className="me-2"
                             />
                             Area Privata
-                        </Link>
+                        </span>
                     ) : (
                         <Link className="navbar-brand d-flex align-items-center" to="/">
                             <img
@@ -84,14 +109,17 @@ const App = () => {
                         <ul className="nav navbar-nav ms-auto">
                             {isPrivate ? (
                                 <>
-                                    <li className="nav-item">
-                                        <button className="btn btn-danger ms-2" onClick={onLogout}>Logout</button>
+                                    <li className="nav-item d-flex align-items-center ms-2">
+                                        <button className="btn btn-danger" onClick={onLogout}>Logout</button>
                                     </li>
                                 </>
                             ) : (
                                 <>
                                     <li className="nav-item">
-                                        <Link className="nav-link" to="/news">News/Attività</Link>
+                                        <Link className="nav-link" to="/">Home</Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to="/news">Eventi</Link>
                                     </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/galleria">Galleria</Link>
@@ -102,8 +130,14 @@ const App = () => {
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/5x1000">5 x mille</Link>
                                     </li>
-                                    <li className="nav-item">
-                                        <Link className="nav-link" to="/struttura-organizzativa">Struttura Organizzativa</Link>
+                                    <li className="nav-item dropdown">
+                                        <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            ASSOCIAZIONE
+                                        </a>
+                                        <ul className="dropdown-menu">
+                                            <li><Link className="dropdown-item" to="/storia">Storia</Link></li>
+                                            <li><Link className="dropdown-item" to="/struttura-organizzativa">Struttura Organizzativa</Link></li>
+                                        </ul>
                                     </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/corsi">I Nostri Corsi</Link>
@@ -126,7 +160,12 @@ const App = () => {
                     <Route
                         path="/"
                         element={
-                            <div className="container-xxl mt-5">
+                            <>
+                                <section className="home-hero">
+                                    <span className="visually-hidden" role="img" aria-label="Volontari della Croce d'Oro durante un'attività sul territorio"></span>
+                                </section>
+
+                                <div className="container-xxl mt-5">
                                 <div className="row">
                                     <div className="col-lg-8 mb-4">
                                         <div className="ps-0 pe-4 pt-0 pb-5">
@@ -175,36 +214,41 @@ const App = () => {
                                         </div>
 
                                         <div className="mt-5">
-                                            <h2>Attività recenti</h2>
-                                            <div className="row">
-                                                <div className="col-md-4">
-                                                    <div className="card">
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">Corso di Primo Soccorso</h5>
-                                                            <p className="card-text">Organizzato un corso di formazione per volontari sulla gestione delle emergenze mediche.</p>
-                                                            <a href="/news.html" className="btn btn-primary">Scopri di più</a>
+                                            <h2>Prossimi Eventi</h2>
+                                            {
+                                                (() => {
+                                                    const today = new Date();
+                                                    const todayKey = today.toISOString().slice(0,10);
+                                                    const toTime = (d, t) => {
+                                                        const [hh,mm] = (t || '00:00').split(':');
+                                                        return new Date(`${d}T${hh.padStart(2,'0')}:${mm.padStart(2,'0')}:00`);
+                                                    };
+                                                    const upcoming = listEvents()
+                                                      .filter(e => e.status !== 'bozza' && e.date >= todayKey)
+                                                      .sort((a,b) => toTime(a.date,a.time) - toTime(b.date,b.time))
+                                                      .slice(0,3);
+                                                    if (upcoming.length === 0) {
+                                                        return <div className="text-muted">Nessun evento imminente. Consulta il <Link to="/news">calendario</Link>.</div>
+                                                    }
+                                                    return (
+                                                        <div className="row">
+                                                            {upcoming.map(ev => (
+                                                                <div className="col-md-4" key={ev.id}>
+                                                                    <div className="card h-100">
+                                                                        {ev.image && <img src={ev.image} alt={ev.title} className="card-img-top" style={{ objectFit: 'cover', maxHeight: '160px' }} />}
+                                                                        <div className="card-body d-flex flex-column">
+                                                                            <h5 className="card-title mb-1">{ev.title}</h5>
+                                                                            <div className="text-muted small mb-2">{ev.date}{ev.time ? ` • ${ev.time}` : ''}</div>
+                                                                            {ev.description && <p className="card-text flex-grow-1">{ev.description.length>120? ev.description.slice(0,120)+'…' : ev.description}</p>}
+                                                                            <Link className="btn btn-primary mt-auto" to={`/eventi/${ev.id}`}>Dettagli</Link>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <div className="card">
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">Intervento in Emergenza</h5>
-                                                            <p className="card-text">Partecipazione attiva durante l'ultima alluvione per assistenza alla popolazione.</p>
-                                                            <a href="/galleria.html" className="btn btn-primary">Vedi foto</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <div className="card">
-                                                        <div className="card-body">
-                                                            <h5 className="card-title">Giornata di Solidarietà</h5>
-                                                            <p className="card-text">Evento comunitario per raccogliere fondi e sensibilizzare sulla protezione civile.</p>
-                                                            <a href="/news.html" className="btn btn-primary">Scopri di più</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                    );
+                                                })()
+                                            }
                                         </div>
                                     </div>
                                     <div className="col-lg-4">
@@ -237,18 +281,20 @@ const App = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                </div>
+                            </>
                         }
                     />
 
                     <Route path="/mezzi" element={<Mezzi />} />
                     <Route path="/5x1000" element={<CinquePerMille />} />
                     <Route path="/struttura-organizzativa" element={<StrutturaOrganizzativa />} />
+                    <Route path="/storia" element={<Storia />} />
                     <Route path="/corsi" element={<Corsi />} />
                     <Route path="/diventare-volontario" element={<DiventareVolontario />} />
                     <Route path="/richiedere-servizio" element={<RichiedereServizio />} />
-                    <Route path="/chi-siamo" element={<ChiSiamo />} />
                     <Route path="/news" element={<News />} />
+                    <Route path="/eventi/:id" element={<EventDetail />} />
                     <Route path="/galleria" element={<Galleria />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
@@ -271,8 +317,10 @@ const App = () => {
                         <Route path="fogli-marcia/ricerca" element={<RicercaFogliMarcia />} />
                         <Route path="fogli-marcia/report" element={<ReportFogliMarcia />} />
                         <Route path="tools/amministrazione/utenti" element={<ProtectedRoute roles={['admin']}><Personale /></ProtectedRoute>} />
+                        <Route path="tools/eventi" element={<ProtectedRoute roles={['admin']}><PrivateEventEditor /></ProtectedRoute>} />
                         <Route path="tools/amministrazione/mezzi" element={<ProtectedRoute roles={['admin']}><AdminMezzi /></ProtectedRoute>} />
                         <Route path="tools/amministrazione/mezzi/:id" element={<ProtectedRoute roles={['admin']}><MezzoGestione /></ProtectedRoute>} />
+                        <Route path="attivita/crea" element={<ProtectedRoute><CreazionePostAttivita /></ProtectedRoute>} />
                     </Route>
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

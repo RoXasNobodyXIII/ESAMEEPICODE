@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 
 const StrutturaOrganizzativa = () => {
   useEffect(() => {
-    document.title = "Struttura Organizzativa";
+    document.title = "ORGANIZZAZIONE";
   }, []);
   const imageUrl = "https://res.cloudinary.com/dkbahjqa6/image/upload/v1760607657/user_lynu20.png";
 
   return (
     <div className="container mt-5">
-      <h2>Struttura Organizzativa</h2>
+
       <div className="mt-4">
-        <h3>Il Consiglio Direttivo</h3>
+        <h3>CONSIGLIO DIRETTIVO</h3>
         <p className="mb-3">Eletto il 26 settembre 2022, il Consiglio Direttivo della nostra Associazione, insieme ai volontari e a tutti i soci, lavora con impegno e passione per favorire la crescita e il benessere della nostra comunità ed è composto da:</p>
         <div className="row row-cols-1 row-cols-md-2 g-3">
           <div className="col">

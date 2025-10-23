@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
 const NuovoFoglioDiMarcia = () => {
   useEffect(() => {
     document.title = "Foglio Marcia";
   }, []);
+
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     tipologiaServizio: 'Servizio Secondario',
@@ -45,6 +48,8 @@ const NuovoFoglioDiMarcia = () => {
   const [vehicles, setVehicles] = useState([]);
   const [vehLoading, setVehLoading] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState('');
+  const [crew, setCrew] = useState([]);
+  const [crewLoading, setCrewLoading] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -64,6 +69,7 @@ const NuovoFoglioDiMarcia = () => {
       const { data } = await api.post('/fogli-marcia', payload);
       const code = data.serviceCode || `#${data.id}`;
       setSubmitOk(`Creato foglio ${code}`);
+      navigate('/private/fogli-marcia');
     } catch (err) {
       const apiMsg = err.response?.data?.message;
       const apiDetail = err.response?.data?.error;
@@ -97,6 +103,19 @@ const NuovoFoglioDiMarcia = () => {
     finally { setVehLoading(false); }
   };
   useEffect(() => { loadVehicles(); }, []);
+
+  const loadCrew = async () => {
+    setCrewLoading(true);
+    try {
+      const { data } = await api.get('/fogli-marcia/crew-options', { params: { roles: 'autista,soccorritore,infermiere,medico' } });
+      setCrew(Array.isArray(data) ? data : []);
+    } catch (_) { setCrew([]); }
+    finally { setCrewLoading(false); }
+  };
+  useEffect(() => { loadCrew(); }, []);
+
+  const capWords = (s) => (s || '').replace(/\s+/g, ' ').trim().split(' ').map(w => w ? (w[0].toUpperCase() + w.slice(1).toLowerCase()) : '').join(' ');
+  const crewLabel = (u) => `${(u?.nome || '').trim()} ${(u?.cognome || '').trim()}${u?.username ? ` (${u.username})` : ''}`.trim();
 
   return (
     <div>
@@ -140,11 +159,11 @@ const NuovoFoglioDiMarcia = () => {
           {/* Dati anagrafici */}
           <div className="col-md-6">
             <label className="form-label">👤 Cognome</label>
-            <input className="form-control" value={form.cognome} onChange={(e) => setField('cognome', e.target.value)} required />
+            <input className="form-control" value={form.cognome} onChange={(e) => setField('cognome', e.target.value)} onBlur={(e)=>setField('cognome', capWords(e.target.value))} required />
           </div>
           <div className="col-md-6">
             <label className="form-label">👤 Nome</label>
-            <input className="form-control" value={form.nome} onChange={(e) => setField('nome', e.target.value)} required />
+            <input className="form-control" value={form.nome} onChange={(e) => setField('nome', e.target.value)} onBlur={(e)=>setField('nome', capWords(e.target.value))} required />
           </div>
           <div className="col-md-4">
             <label className="form-label">🚻 Sesso</label>
@@ -161,12 +180,12 @@ const NuovoFoglioDiMarcia = () => {
           </div>
           <div className="col-md-4">
             <label className="form-label">🗺 Indirizzo</label>
-            <input className="form-control" value={form.indirizzo} onChange={(e) => setField('indirizzo', e.target.value)} />
+            <input className="form-control" value={form.indirizzo} onChange={(e) => setField('indirizzo', e.target.value)} onBlur={(e)=>setField('indirizzo', capWords(e.target.value))} required />
           </div>
           {/* Comune */}
           <div className="col-12">
             <label className="form-label">📍 Comune</label>
-            <input className="form-control" list="comuni-suggeriti" placeholder="Digita il comune" value={form.comune} onChange={(e) => setField('comune', e.target.value)} />
+            <input className="form-control" list="comuni-suggeriti" placeholder="Digita il comune" value={form.comune} onChange={(e) => setField('comune', e.target.value)} onBlur={(e)=>setField('comune', capWords(e.target.value))} required />
             <datalist id="comuni-suggeriti">
               <option value="Latina" />
               <option value="Formia" />
@@ -178,7 +197,7 @@ const NuovoFoglioDiMarcia = () => {
           {/* Esito e destinazione */}
           <div className="col-md-6">
             <label className="form-label">📥 Esito</label>
-            <select className="form-select" value={form.esito} onChange={(e) => setField('esito', e.target.value)}>
+            <select className="form-select" value={form.esito} onChange={(e) => setField('esito', e.target.value)} required>
               <option value="">- SELEZIONA -</option>
               <option>PS/DEA</option>
               <option>Ospedale/Clinica</option>
@@ -188,24 +207,24 @@ const NuovoFoglioDiMarcia = () => {
           </div>
           <div className="col-md-6">
             <label className="form-label">🗺 Destinazione</label>
-            <input className="form-control" value={form.destinazione} onChange={(e) => setField('destinazione', e.target.value)} />
+            <input className="form-control" value={form.destinazione} onChange={(e) => setField('destinazione', e.target.value)} onBlur={(e)=>setField('destinazione', capWords(e.target.value))} required />
           </div>
           {/* Tempi */}
           <div className="col-md-3">
-            <label className="form-label">🕐 Uscita</label>
-            <input type="time" className="form-control" value={form.uscita} onChange={(e) => setField('uscita', e.target.value)} />
+            <label className="form-label">🕐 Uscita (data e ora)</label>
+            <input type="datetime-local" className="form-control" value={form.uscita} onChange={(e) => setField('uscita', e.target.value)} required />
           </div>
           <div className="col-md-3">
-            <label className="form-label">🕒 Sul posto</label>
-            <input type="time" className="form-control" value={form.sulPosto} onChange={(e) => setField('sulPosto', e.target.value)} />
+            <label className="form-label">🕒 Sul posto (data e ora)</label>
+            <input type="datetime-local" className="form-control" value={form.sulPosto} onChange={(e) => setField('sulPosto', e.target.value)} required />
           </div>
           <div className="col-md-3">
-            <label className="form-label">🕗 Arrivo Destinazione</label>
-            <input type="time" className="form-control" value={form.arrivoDestinazione} onChange={(e) => setField('arrivoDestinazione', e.target.value)} />
+            <label className="form-label">🕗 Arrivo destinazione (data e ora)</label>
+            <input type="datetime-local" className="form-control" value={form.arrivoDestinazione} onChange={(e) => setField('arrivoDestinazione', e.target.value)} required />
           </div>
           <div className="col-md-3">
-            <label className="form-label">🕚 Fine</label>
-            <input type="time" className="form-control" value={form.fine} onChange={(e) => setField('fine', e.target.value)} />
+            <label className="form-label">🕚 Fine (data e ora)</label>
+            <input type="datetime-local" className="form-control" value={form.fine} onChange={(e) => setField('fine', e.target.value)} required />
           </div>
 
           {/* Mezzo e KM */}
@@ -221,6 +240,7 @@ const NuovoFoglioDiMarcia = () => {
                 const label = v ? `${v.identificativo || ''} - ${v.targa || ''} - ${v.codiceARES || ''}`.replace(/\s+-\s+-\s*$/,'').trim() : '';
                 setField('mezzo', label);
               }}
+              required
             >
               <option value="">- SELEZIONA -</option>
               {vehicles.map(v => {
@@ -232,40 +252,80 @@ const NuovoFoglioDiMarcia = () => {
           </div>
           <div className="col-md-3">
             <label className="form-label">🛫 Km iniziali</label>
-            <input type="number" className="form-control" value={form.kmIniziali} onChange={(e) => setField('kmIniziali', e.target.value)} />
+            <input type="number" className="form-control" value={form.kmIniziali} onChange={(e) => setField('kmIniziali', e.target.value)} required />
           </div>
           <div className="col-md-3">
             <label className="form-label">🛬 Km finali</label>
-            <input type="number" className="form-control" value={form.kmFinali} onChange={(e) => setField('kmFinali', e.target.value)} />
+            <input type="number" className="form-control" value={form.kmFinali} onChange={(e) => setField('kmFinali', e.target.value)} required />
           </div>
 
 
           {/* Equipaggio */}
           <div className="col-md-6">
             <label className="form-label">🚔 Autista</label>
-            <input className="form-control" placeholder="Inserisci nome" value={form.autista} onChange={(e) => setField('autista', e.target.value)} />
+            <select className="form-select" value={form.autista} onChange={(e) => setField('autista', e.target.value)} required>
+              <option value="">- SELEZIONA -</option>
+              {crew
+                .filter(u => Array.isArray(u.qualifiche) && u.qualifiche.includes('autista'))
+                .map(u => (
+                  <option key={u.username} value={u.username}>{crewLabel(u)}</option>
+                ))}
+            </select>
+            {crewLoading && <div className="form-text">Caricamento equipaggio...</div>}
           </div>
           <div className="col-md-6">
             <label className="form-label">⛑ Soccorritore 1</label>
-            <input className="form-control" placeholder="Inserisci nome" value={form.soccorritore1} onChange={(e) => setField('soccorritore1', e.target.value)} />
+            <select className="form-select" value={form.soccorritore1} onChange={(e) => setField('soccorritore1', e.target.value)} required>
+              <option value="">- SELEZIONA -</option>
+              {crew
+                .filter(u => Array.isArray(u.qualifiche) && u.qualifiche.includes('soccorritore'))
+                .map(u => (
+                  <option key={`s1-${u.username}`} value={u.username}>{crewLabel(u)}</option>
+                ))}
+            </select>
+            {crewLoading && <div className="form-text">Caricamento equipaggio...</div>}
           </div>
           <div className="col-md-6">
             <label className="form-label">⛑ Soccorritore 2</label>
-            <input className="form-control" placeholder="Inserisci nome" value={form.soccorritore2} onChange={(e) => setField('soccorritore2', e.target.value)} />
+            <select className="form-select" value={form.soccorritore2} onChange={(e) => setField('soccorritore2', e.target.value)} required>
+              <option value="">- SELEZIONA -</option>
+              {crew
+                .filter(u => Array.isArray(u.qualifiche) && u.qualifiche.includes('soccorritore'))
+                .map(u => (
+                  <option key={`s2-${u.username}`} value={u.username}>{crewLabel(u)}</option>
+                ))}
+            </select>
+            {crewLoading && <div className="form-text">Caricamento equipaggio...</div>}
           </div>
           <div className="col-md-6">
             <label className="form-label">💉 Infermiere</label>
-            <input className="form-control" placeholder="Inserisci nome" value={form.infermiere} onChange={(e) => setField('infermiere', e.target.value)} />
+            <select className="form-select" value={form.infermiere} onChange={(e) => setField('infermiere', e.target.value)} required>
+              <option value="">- SELEZIONA -</option>
+              {crew
+                .filter(u => Array.isArray(u.qualifiche) && u.qualifiche.includes('infermiere'))
+                .map(u => (
+                  <option key={u.username} value={u.username}>{crewLabel(u)}</option>
+                ))}
+            </select>
+            {crewLoading && <div className="form-text">Caricamento equipaggio...</div>}
           </div>
           <div className="col-md-6">
             <label className="form-label">🧑‍⚕️ Medico</label>
-            <input className="form-control" placeholder="Inserisci nome" value={form.medico} onChange={(e) => setField('medico', e.target.value)} />
+            <select className="form-select" value={form.medico} onChange={(e) => setField('medico', e.target.value)} required>
+              <option value="">- SELEZIONA -</option>
+              {crew
+                .filter(u => Array.isArray(u.qualifiche) && u.qualifiche.includes('medico'))
+                .map(u => (
+                  <option key={u.username} value={u.username}>{crewLabel(u)}</option>
+                ))}
+            </select>
+            {crewLoading && <div className="form-text">Caricamento equipaggio...</div>}
           </div>
 
           {/* Note */}
           <div className="col-12">
             <label className="form-label">🗒 Note</label>
-            <textarea className="form-control" rows={3} placeholder="Non aggiungere qui liste di utenti; usa solo note sul servizio." value={form.note} onChange={(e) => setField('note', e.target.value)} />
+            <textarea className="form-control" rows={3} placeholder="Non aggiungere qui liste di utenti; usa solo note sul servizio." value={form.note} onChange={(e) => setField('note', e.target.value)} required />
           </div>
         </div>
 

@@ -7,7 +7,7 @@ const Personale = () => {
   const [nome, setNome] = useState('');
   const [cognome, setCognome] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('volontario');
+  
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -20,7 +20,6 @@ const Personale = () => {
     nome: '',
     cognome: '',
     email: '',
-    role: 'volontario',
     password: '',
     cellulare: '',
     qualifiche: [],
@@ -45,7 +44,9 @@ const Personale = () => {
     soccorsi: { inserire: false, elenco: false, ricerca: false, report: false },
     fogliMarcia: { inserire: false, elenco: false, ricerca: false, modifica: false, altro: false, tutto: false },
     ferie: { nuovaRichiesta: false },
-    amministrazione: { utenti: false, mezzi: false }
+    amministrazione: { utenti: false, mezzi: false },
+    sito: { gestione: false },
+    calendar: { view: false }
   });
   
 
@@ -83,10 +84,10 @@ const Personale = () => {
 
     setLoading(true);
     try {
-      const payload = { nome, cognome, email, role, cellulare, qualifiche, stato, permessi };
+      const payload = { nome, cognome, email, role: 'volontario', cellulare, qualifiche, stato, permessi };
       const { data } = await api.post('/users/invite', payload);
       setMessage(`Utente creato: ${data.user.username}. È stata inviata un'email con le credenziali.`);
-      setNome(''); setCognome(''); setEmail(''); setRole('volontario');
+      setNome(''); setCognome(''); setEmail('');
       setCellulare('');
       setQualifiche([]);
       setStato({ volontario: false, attivo: true });
@@ -94,7 +95,8 @@ const Personale = () => {
         soccorsi: { inserire: false, elenco: false, ricerca: false, report: false },
         fogliMarcia: { inserire: false, elenco: false, ricerca: false, modifica: false, altro: false, tutto: false },
         ferie: { nuovaRichiesta: false },
-        amministrazione: { utenti: false, mezzi: false }
+        amministrazione: { utenti: false, mezzi: false },
+        sito: { gestione: false }
       });
       setAssociate(false);
       
@@ -115,7 +117,6 @@ const Personale = () => {
       nome: u.nome || '',
       cognome: u.cognome || '',
       email: u.email || '',
-      role: u.role || 'volontario',
       password: '',
       cellulare: u.cellulare || '',
       qualifiche: Array.isArray(u.qualifiche) ? u.qualifiche : [],
@@ -141,7 +142,9 @@ const Personale = () => {
         amministrazione: {
           utenti: !!u?.permessi?.amministrazione?.utenti,
           mezzi: !!u?.permessi?.amministrazione?.mezzi
-        }
+        },
+        sito: { gestione: !!u?.permessi?.sito?.gestione },
+        calendar: { view: !!u?.permessi?.calendar?.view }
       }
     });
     setEditModalOpen(true);
@@ -154,7 +157,6 @@ const Personale = () => {
     setEditData({
       username: '',
       email: '',
-      role: 'volontario',
       password: '',
       cellulare: '',
       qualifiche: [],
@@ -163,7 +165,9 @@ const Personale = () => {
         soccorsi: { inserire: false, elenco: false, ricerca: false, report: false },
         fogliMarcia: { inserire: false, elenco: false, ricerca: false, modifica: false, altro: false, tutto: false },
         ferie: { nuovaRichiesta: false },
-        amministrazione: { utenti: false, mezzi: false }
+        amministrazione: { utenti: false, mezzi: false },
+        sito: { gestione: false },
+        calendar: { view: false }
       }
     });
   };
@@ -296,6 +300,18 @@ const Personale = () => {
                   </div>
                   <div className="col-12">
                     <label className="form-label">Permessi</label>
+                    <div className="mb-2">
+                      <button type="button" className="btn btn-sm btn-outline-success" onClick={() => {
+                        setPermessi({
+                          soccorsi: { inserire: true, elenco: true, ricerca: true, report: true },
+                          fogliMarcia: { inserire: true, elenco: true, ricerca: true, modifica: true, altro: true, tutto: true },
+                          ferie: { nuovaRichiesta: true },
+                          amministrazione: { utenti: true, mezzi: true },
+                          sito: { gestione: true },
+                          calendar: { view: true }
+                        });
+                      }}>Permetti tutto</button>
+                    </div>
                     <div className="row g-3">
                       
                       <div className="col-12 mt-2">
@@ -360,6 +376,30 @@ const Personale = () => {
                               </div>
                             </div>
                           ))}
+                        </div>
+                      </div>
+
+                      <div className="col-12 mt-3">
+                        <div className="mb-1 fw-semibold">Sito</div>
+                        <div className="row g-3 align-items-center">
+                          <div className="col-auto">
+                            <div className="form-check d-flex align-items-center gap-2">
+                              <input id="pm-sito-gestione" className="form-check-input" type="checkbox" checked={!!permessi.sito?.gestione} onChange={(e) => setPermessi({ ...permessi, sito: { gestione: e.target.checked } })} />
+                              <label className="form-check-label" htmlFor="pm-sito-gestione">Gestione sito</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-12 mt-3">
+                        <div className="mb-1 fw-semibold">Calendario</div>
+                        <div className="row g-3 align-items-center">
+                          <div className="col-auto">
+                            <div className="form-check d-flex align-items-center gap-2">
+                              <input id="pm-cal-view" className="form-check-input" type="checkbox" checked={!!permessi.calendar?.view} onChange={(e) => setPermessi({ ...permessi, calendar: { view: e.target.checked } })} />
+                              <label className="form-check-label" htmlFor="pm-cal-view">Solo visualizzazione calendario</label>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -442,7 +482,7 @@ const Personale = () => {
                       <th>Nome</th>
                       <th>Cognome</th>
                       <th>Email</th>
-                      <th>Ruolo</th>
+                      <th>Qualifiche</th>
                       <th>Stato</th>
                       <th style={{ width: '120px' }}>Azioni</th>
                     </tr>
@@ -455,7 +495,7 @@ const Personale = () => {
                         <td>{u.nome || '-'}</td>
                         <td>{u.cognome || '-'}</td>
                         <td>{u.email}</td>
-                        <td>{u.role}</td>
+                        <td>{Array.isArray(u.qualifiche) && u.qualifiche.length ? u.qualifiche.join(', ') : '-'}</td>
                         <td>
                           {u.suspended ? <span className="badge bg-danger">Sospeso</span> : <span className="badge bg-success">Attivo</span>}
                         </td>
@@ -506,7 +546,13 @@ const Personale = () => {
                   <div className="mt-1">
                     <span className="badge bg-light text-dark me-1">{u.nome || '-'}</span>
                     <span className="badge bg-light text-dark me-1">{u.cognome || '-'}</span>
-                    <span className="badge bg-light text-dark me-1">{u.role}</span>
+                    {Array.isArray(u.qualifiche) && u.qualifiche.length ? (
+                      u.qualifiche.map((q) => (
+                        <span key={`${u.id}-q-${q}`} className="badge bg-secondary me-1">{q}</span>
+                      ))
+                    ) : (
+                      <span className="badge bg-light text-dark me-1">-</span>
+                    )}
                     {u.suspended ? <span className="badge bg-danger">Sospeso</span> : <span className="badge bg-success">Attivo</span>}
                   </div>
                 </div>

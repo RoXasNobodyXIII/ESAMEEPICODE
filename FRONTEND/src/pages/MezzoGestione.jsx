@@ -11,7 +11,7 @@ const MezzoGestione = () => {
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
 
-  const [v, setV] = useState({ targa: '', codiceARES: '', identificativo: '', tipologia: '', posti: '', olioMax: '', currentKm: '', note: '' });
+  const [v, setV] = useState({ targa: '', codiceARES: '', identificativo: '', posti: '', olioMax: '', currentKm: '', note: '' });
   const [events, setEvents] = useState([]);
   const [evForm, setEvForm] = useState({ type: 'assicurazione', date: '', prossimaData: '', km: '', prossimoKm: '', luogo: '', eseguitoDa: '', note: '' });
   const [notifDays, setNotifDays] = useState(15);
@@ -19,26 +19,28 @@ const MezzoGestione = () => {
   const [collapsed, setCollapsed] = useState({ assicurazione: false, revisione: false, tagliando: false, pneumatici: false });
   const addFormRef = useRef(null);
   const [showModal, setShowModal] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
 
   const load = async () => {
     if (!Number.isFinite(vid)) return;
     setLoading(true); setError(''); setMsg('');
     try {
-      const [{ data: vd }, { data: evd }] = await Promise.all([
+      const [{ data: vd }, { data: evd }, { data: users }] = await Promise.all([
         api.get(`/vehicles/${vid}`),
-        api.get(`/vehicles/${vid}/events`)
+        api.get(`/vehicles/${vid}/events`),
+        api.get('/users')
       ]);
       setV({
         targa: vd.targa || '',
         codiceARES: vd.codiceARES || '',
         identificativo: vd.identificativo || '',
-        tipologia: vd.tipologia || '',
         posti: vd.posti ?? '',
         olioMax: vd.olioMax ?? '',
         currentKm: vd.currentKm ?? '',
         note: vd.note || ''
       });
       setEvents(Array.isArray(evd) ? evd : []);
+      setAllUsers(Array.isArray(users) ? users : []);
     } catch (e) {
       setError('Errore caricamento mezzo');
     } finally { setLoading(false); }
@@ -53,7 +55,6 @@ const MezzoGestione = () => {
         targa: v.targa,
         codiceARES: v.codiceARES,
         identificativo: v.identificativo,
-        tipologia: v.tipologia,
         posti: v.posti ? Number(v.posti) : 0,
         olioMax: v.olioMax ? Number(v.olioMax) : 0,
         currentKm: v.currentKm ? Number(v.currentKm) : 0,
@@ -138,7 +139,8 @@ const MezzoGestione = () => {
                       <table className="table table-sm mb-0" style={{color:'#ddd'}}>
                         <thead style={{background:'#222'}}>
                           <tr>
-                            <th style={{width:'50%'}}>Scadenza</th>
+                            <th>Scadenza</th>
+                            <th>Km scadenza</th>
                             <th className="text-end">Tools</th>
                           </tr>
                         </thead>
@@ -146,12 +148,13 @@ const MezzoGestione = () => {
                           {(grouped.get(sec.k) || []).map(ev => (
                             <tr key={ev.id}>
                               <td>{ev.prossimaData ? new Date(ev.prossimaData).toLocaleDateString('it-IT') : (ev.date ? new Date(ev.date).toLocaleDateString('it-IT') : '-')}</td>
+                              <td>{ev.prossimoKm ?? ev.km ?? '-'}</td>
                               <td className="text-end">-</td>
                             </tr>
                           ))}
                           {!((grouped.get(sec.k) || []).length) && (
                             <tr>
-                              <td colSpan="2" className="text-center" style={{color:'#aaa'}}>NESSUN RECORD</td>
+                              <td colSpan="3" className="text-center" style={{color:'#aaa'}}>NESSUN RECORD</td>
                             </tr>
                           )}
                         </tbody>
@@ -163,7 +166,10 @@ const MezzoGestione = () => {
                       {(grouped.get(sec.k) || []).map(ev => (
                         <div key={ev.id} className="list-group-item" style={{background:'#111', color:'#ddd'}}>
                           <div className="d-flex justify-content-between align-items-center">
-                            <div>{ev.prossimaData ? new Date(ev.prossimaData).toLocaleDateString('it-IT') : (ev.date ? new Date(ev.date).toLocaleDateString('it-IT') : '-')}</div>
+                            <div>
+                              <div>Scadenza: {ev.prossimaData ? new Date(ev.prossimaData).toLocaleDateString('it-IT') : (ev.date ? new Date(ev.date).toLocaleDateString('it-IT') : '-')}</div>
+                              <div className="small text-muted">Km scadenza: {ev.prossimoKm ?? ev.km ?? '-'}</div>
+                            </div>
                             <div className="text-end" style={{minWidth:'60px'}}>-</div>
                           </div>
                         </div>
@@ -191,7 +197,7 @@ const MezzoGestione = () => {
               <label className="form-label">Soglia km</label>
               <input type="number" className="form-control" value={notifKm} onChange={(e)=>setNotifKm(e.target.value)} />
             </div>
-            <button className="btn btn-outline-primary ms-auto" onClick={triggerNotify}>Invia notifiche</button>
+            <button className="btn btn-outline-primary ms-auto" onClick={triggerNotify}>Invia notifiche email</button>
           </div>
         </div>
       </div>
@@ -206,16 +212,6 @@ const MezzoGestione = () => {
               </div>
               <div className="modal-body">
                 <form onSubmit={addEvent} className="row g-3">
-                  <div className="col-md-4">
-                    <label className="form-label">Tipo</label>
-                    <select className="form-select" value={evForm.type} onChange={(e)=>setEvForm({ ...evForm, type: e.target.value })}>
-                      <option value="assicurazione">Assicurazione</option>
-                      <option value="revisione">Revisione</option>
-                      <option value="tagliando">Tagliando</option>
-                      <option value="pneumatici">Pneumatici</option>
-                      <option value="manutenzione">Manutenzione</option>
-                    </select>
-                  </div>
                   <div className="col-md-4">
                     <label className="form-label">Data</label>
                     <input type="date" className="form-control" value={evForm.date} onChange={(e)=>setEvForm({ ...evForm, date: e.target.value })} />
@@ -236,13 +232,18 @@ const MezzoGestione = () => {
                     <label className="form-label">Luogo</label>
                     <input className="form-control" value={evForm.luogo} onChange={(e)=>setEvForm({ ...evForm, luogo: e.target.value })} />
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-8">
                     <label className="form-label">Eseguito da</label>
-                    <input className="form-control" value={evForm.eseguitoDa} onChange={(e)=>setEvForm({ ...evForm, eseguitoDa: e.target.value })} />
+                    <select className="form-select" value={evForm.eseguitoDa} onChange={(e)=>setEvForm({ ...evForm, eseguitoDa: e.target.value })}>
+                      <option value="">- SELEZIONA -</option>
+                      {allUsers.map(u => (
+                        <option key={u.id} value={u.id}>{u.nome || u.username} {u.cognome || ''}</option>
+                      ))}
+                    </select>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-12">
                     <label className="form-label">Note</label>
-                    <input className="form-control" value={evForm.note} onChange={(e)=>setEvForm({ ...evForm, note: e.target.value })} />
+                    <textarea className="form-control" rows={5} value={evForm.note} onChange={(e)=>setEvForm({ ...evForm, note: e.target.value })} />
                   </div>
                   <div className="col-12 d-flex justify-content-end">
                     <button className="btn btn-secondary" type="submit">Salva</button>

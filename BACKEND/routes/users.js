@@ -45,6 +45,8 @@ const userValidationRules = [
   body('permessi.checklistAutisti.nuova').optional().isBoolean().toBoolean(),
   body('permessi.checklistAutisti.segnalazioni').optional().isBoolean().toBoolean(),
   body('permessi.checklistAutisti.mia').optional().isBoolean().toBoolean(),
+  body('permessi.sito').optional().isObject(),
+  body('permessi.sito.gestione').optional().isBoolean().toBoolean(),
   body('permessi.ferie').optional().isObject(),
   body('permessi.ferie.nuovaRichiesta').optional().isBoolean().toBoolean(),
   body('permessi.amministrazione').optional().isObject(),
@@ -133,6 +135,8 @@ router.post(
     body('permessi.checklistAutisti.nuova').optional().isBoolean().toBoolean(),
     body('permessi.checklistAutisti.segnalazioni').optional().isBoolean().toBoolean(),
     body('permessi.checklistAutisti.mia').optional().isBoolean().toBoolean(),
+    body('permessi.sito').optional().isObject(),
+    body('permessi.sito.gestione').optional().isBoolean().toBoolean(),
     body('permessi.ferie').optional().isObject(),
     body('permessi.ferie.nuovaRichiesta').optional().isBoolean().toBoolean(),
     body('permessi.amministrazione').optional().isObject(),
@@ -162,6 +166,7 @@ router.post(
     const pc = req.body?.permessi?.consegne || {};
     const pcl = req.body?.permessi?.checklist || {};
     const pcla = req.body?.permessi?.checklistAutisti || {};
+    const psito = req.body?.permessi?.sito || {};
     const pf = req.body?.permessi?.ferie || {};
     const pa = req.body?.permessi?.amministrazione || {};
     const permessi = {
@@ -191,6 +196,9 @@ router.post(
         nuova: pcla.nuova === true,
         segnalazioni: pcla.segnalazioni === true,
         mia: pcla.mia === true
+      },
+      sito: {
+        gestione: psito.gestione === true
       },
       ferie: {
         nuovaRichiesta: pf.nuovaRichiesta === true
@@ -366,6 +374,7 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), userValidationRule
     const pcu = req.body?.permessi?.consegne || {};
     const pclu = req.body?.permessi?.checklist || {};
     const pcla_u = req.body?.permessi?.checklistAutisti || {};
+    const psito_u = req.body?.permessi?.sito || {};
     const pfu = req.body?.permessi?.ferie || {};
     const pau = req.body?.permessi?.amministrazione || {};
     const permessi = {
@@ -395,6 +404,9 @@ router.put('/:id', authMiddleware, roleMiddleware(['admin']), userValidationRule
         nuova: pcla_u.nuova ?? existing?.permessi?.checklistAutisti?.nuova ?? false,
         segnalazioni: pcla_u.segnalazioni ?? existing?.permessi?.checklistAutisti?.segnalazioni ?? false,
         mia: pcla_u.mia ?? existing?.permessi?.checklistAutisti?.mia ?? false
+      },
+      sito: {
+        gestione: psito_u.gestione ?? existing?.permessi?.sito?.gestione ?? false
       },
       ferie: {
         nuovaRichiesta: pfu.nuovaRichiesta ?? existing?.permessi?.ferie?.nuovaRichiesta ?? false

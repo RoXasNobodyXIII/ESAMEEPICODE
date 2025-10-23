@@ -11,7 +11,7 @@ const AdminMezzi = () => {
   const [msg, setMsg] = useState('');
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-  const [newV, setNewV] = useState({ identificativo: '', targa: '', tipologia: '' });
+  const [newV, setNewV] = useState({ identificativo: '', targa: '', codiceARES: '' });
 
 
   const load = async () => {
@@ -31,15 +31,15 @@ const AdminMezzi = () => {
       const body = {
         identificativo: (newV.identificativo || '').trim(),
         targa: (newV.targa || '').trim(),
-        tipologia: (newV.tipologia || '').trim()
+        codiceARES: (newV.codiceARES || '').trim()
       };
-      if (!body.identificativo || !body.targa || !body.tipologia) {
-        setError('Compila identificativo, targa e tipologia');
+      if (!body.identificativo || !body.targa || !body.codiceARES) {
+        setError('Compila identificativo, targa e Codice ARES');
         return;
       }
       const { data } = await api.post('/vehicles', body);
       setShowModal(false);
-      setNewV({ identificativo: '', targa: '', tipologia: '' });
+      setNewV({ identificativo: '', targa: '', codiceARES: '' });
       await load();
       if (data?.id) navigate(`/private/tools/amministrazione/mezzi/${data.id}`);
       else setMsg('Mezzo creato');
@@ -65,7 +65,7 @@ const AdminMezzi = () => {
               <table className="table table-sm align-middle table-hover">
                 <thead>
                   <tr>
-                    <th>ID</th><th>Targa</th><th>Tipologia</th><th></th>
+                    <th>ID</th><th>Targa</th><th>Codice ARES</th><th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -73,7 +73,7 @@ const AdminMezzi = () => {
                     <tr key={v.id}>
                       <td>{v.id}</td>
                       <td>{v.targa || '-'}</td>
-                      <td>{v.tipologia || '-'}</td>
+                      <td>{v.codiceARES || '-'}</td>
                       <td className="text-end">
                         <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">
                           <span aria-hidden="true">⚙️</span>
@@ -95,7 +95,7 @@ const AdminMezzi = () => {
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
                       <div><strong>#{v.id}</strong> · {v.targa || '-'} </div>
-                      <div className="small text-muted">{v.tipologia || '-'}</div>
+                      <div className="small text-muted">{v.codiceARES || '-'}</div>
                     </div>
                     <Link className="btn btn-outline-secondary" to={`/private/tools/amministrazione/mezzi/${v.id}`} title="Gestione">⚙️</Link>
                   </div>
@@ -127,8 +127,8 @@ const AdminMezzi = () => {
                     <input className="form-control" value={newV.targa} onChange={(e)=>setNewV({...newV, targa: e.target.value})} required />
                   </div>
                   <div className="col-md-4">
-                    <label className="form-label">Tipologia</label>
-                    <input className="form-control" value={newV.tipologia} onChange={(e)=>setNewV({...newV, tipologia: e.target.value})} required />
+                    <label className="form-label">Codice ARES</label>
+                    <input className="form-control" value={newV.codiceARES} onChange={(e)=>setNewV({...newV, codiceARES: e.target.value})} required />
                   </div>
                   <div className="col-12 d-flex justify-content-end gap-2">
                     <button type="button" className="btn btn-outline-secondary" onClick={()=>setShowModal(false)}>Annulla</button>

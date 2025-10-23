@@ -8,6 +8,39 @@ async function getCurrentUser(req) {
   return db.collection('users').findOne({ username: req.user?.username });
 }
 
+
+// Crew options for assignment
+router.get('/crew-options', authMiddleware, async (req, res) => {
+  try {
+    const user = await getCurrentUser(req);
+    if (!hasPerm(user, 'fogliMarcia', 'inserire')) {
+      return res.status(403).json({ message: 'Permesso mancante: fogliMarcia.inserire' });
+    }
+
+    const db = req.app.locals.db;
+    const usersCol = db.collection('users');
+
+    const valid = ['autista','soccorritore','infermiere','medico'];
+    const rolesParam = String(req.query.roles || '')
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    const wanted = rolesParam.length ? rolesParam.filter((r) => valid.includes(r)) : valid;
+
+    const query = {
+      suspended: { $ne: true },
+      qualifiche: { $in: wanted }
+    };
+
+    const projection = { _id: 0, username: 1, nome: 1, cognome: 1, qualifiche: 1 };
+    const items = await usersCol.find(query, { projection }).toArray();
+    return res.json(items);
+  } catch (err) {
+    console.error('Errore crew-options:', err);
+    return res.status(500).json({ message: 'Errore server' });
+  }
+});
+
 function hasPerm(user, section, key) {
   if (!user) return false;
   if (user.role === 'admin') return true;
