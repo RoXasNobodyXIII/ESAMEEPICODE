@@ -6,6 +6,7 @@ const EventDetail = () => {
   const { id } = useParams();
   const [ev, setEv] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  const [active, setActive] = React.useState(0);
   React.useEffect(() => {
     let mounted = true;
     (async () => {
@@ -30,7 +31,6 @@ const EventDetail = () => {
   );
 
   const images = (Array.isArray(ev.images) && ev.images.length > 0) ? ev.images : (ev.image ? [ev.image] : []);
-  const [active, setActive] = React.useState(0);
 
   return (
     <div className="container mt-5">
