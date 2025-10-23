@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "cross-env ROLLUP_SKIP_NODEJS_NATIVE=true vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "serve -s dist -l $PORT"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
