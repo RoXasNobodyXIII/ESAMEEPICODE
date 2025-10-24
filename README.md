@@ -6,7 +6,7 @@ Applicazione web sviluppata per supportare la **Croce d’Oro Sud Pontino** nell
 
 ## 🌐 Parte pubblica
 
-Render Link: https://crocedorosudpontino.onrender.com/
+Render Link: https://crocedorosudpontino.onrender.com/ (⚠️a cause di un errore Render, potrebbe essere necessario fare Alt+Shift+R per ricaricare la pagina in caso di schermata vuota)
 
 La sezione pubblica è accessibile senza autenticazione ed è pensata per offrire trasparenza e informazioni utili ai cittadini, volontari e collaboratori esterni.
 
