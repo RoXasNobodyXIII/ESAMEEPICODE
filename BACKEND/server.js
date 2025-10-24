@@ -45,17 +45,8 @@ app.use('/uploads', uploadsRoutes);
 app.use('/events', eventsRoutes);
 
 
-const distPath = path.resolve(__dirname, 'dist');
-app.use(express.static(distPath));
-
-
 app.get('/healthz', (req, res) => {
   res.status(200).json({ status: 'ok' });
-});
-
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Start server only after DB connection
