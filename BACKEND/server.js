@@ -44,12 +44,18 @@ app.use('/vehicles', vehiclesRoutes);
 app.use('/uploads', uploadsRoutes);
 app.use('/events', eventsRoutes);
 
-// Basic root and health endpoints (useful for Render health checks)
-app.get('/', (req, res) => {
-  res.status(200).json({ ok: true, name: 'Croce d\'Oro API', version: process.env.RENDER_GIT_COMMIT || 'local' });
-});
+
+const distPath = path.resolve(__dirname, '../FRONTEND/dist');
+app.use(express.static(distPath));
+
+
 app.get('/healthz', (req, res) => {
   res.status(200).json({ status: 'ok' });
+});
+
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Start server only after DB connection

@@ -58,7 +58,7 @@ const Magazzino = () => {
   };
   return (
     <div>
-      <h4>Magazzino</h4>
+      <h4>Magazzino WIP</h4>
       <p className="text-muted">CRUD materiali/dispositivi (lista, aggiungi, modifica, elimina) – integrazione API in corso.</p>
 
       <div className="d-flex align-items-center gap-2 mb-3">
