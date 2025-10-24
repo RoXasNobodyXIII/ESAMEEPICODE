@@ -45,7 +45,7 @@ app.use('/uploads', uploadsRoutes);
 app.use('/events', eventsRoutes);
 
 
-const distPath = path.resolve(__dirname, '../FRONTEND/dist');
+const distPath = path.resolve(__dirname, 'dist');
 app.use(express.static(distPath));
 
 
